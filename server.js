@@ -9,8 +9,9 @@ const fastify = require("fastify")({
 fastify.get("/users/:user/:password", async (request, reply) => {  
   let user = "user1";
   let password = "password123";
+  let validUserCode = "88888";
   if (user == request.params.user && password == request.params.password) {
-    reply.status(200).send();
+    reply.status(200).send(validUserCode);
   } else {
     let errorResponse = {
       version: "1.0",
