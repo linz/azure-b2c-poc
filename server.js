@@ -11,7 +11,7 @@ fastify.get("/users/:user/:password", async (request, reply) => {
   let password = "password123";
   let validUserCode = "88888";
   if (user == request.params.user && password == request.params.password) {
-    reply.status(200).send(validUserCode);
+    reply.status(200).send(`validUserCode: ${validUserCode}`);
   } else {
     let errorResponse = {
       version: "1.0",
