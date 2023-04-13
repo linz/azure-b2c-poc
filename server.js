@@ -25,7 +25,7 @@ fastify.get("/users/:user/:password", async (request, reply) => {
 });
 
 // Run the server!
-fastify.listen({ host: "localhost", port: 3000 }, function (err, address) {
+fastify.listen({ host: "::", port: 3000 }, function (err, address) {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
