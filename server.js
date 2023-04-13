@@ -19,6 +19,7 @@ fastify.get("/user", async (request, reply) => {
       requestId: "requestId",
       userMessage: "Invalid user name and password.",
       developerMessage: `The provided user ${request.params.user} and password cannot found.`,
+      request: JSON.stringify(request)
     };
     reply.status(409).send(errorResponse);
   }
