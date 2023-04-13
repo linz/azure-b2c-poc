@@ -6,7 +6,7 @@ const fastify = require("fastify")({
 //   return { hello: "world" };
 // });
 
-fastify.get("/user", async (request, reply) => {
+fastify.get("/users/:user/:password", async (request, reply) => {  
   let user = "user1";
   let password = "password123";
   if (user == request.params.user && password == request.params.password) {
@@ -18,15 +18,14 @@ fastify.get("/user", async (request, reply) => {
       code: "errorCode",
       requestId: "requestId",
       userMessage: "Invalid user name and password.",
-      developerMessage: `The provided user ${request.params.user} and password cannot found.`,
-      request: JSON.stringify(request)
+      developerMessage: `The provided user ${request.params.user} and password cannot found.`
     };
     reply.status(409).send(errorResponse);
   }
 });
 
 // Run the server!
-fastify.listen({ host: "::", port: 3000 }, function (err, address) {
+fastify.listen({ host: "localhost", port: 3000 }, function (err, address) {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
