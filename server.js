@@ -2,17 +2,14 @@ const fastify = require("fastify")({
   logger: true,
 });
 
-fastify.get("/", async (request, reply) => {
-  return { hello: "world" };
-});
+// fastify.get("/", async (request, reply) => {
+//   return { hello: "world" };
+// });
 
-fastify.post("/user", async (request, reply) => {
+fastify.get("/user", async (request, reply) => {
   let user = "user1";
   let password = "password123";
-  if (
-    user == request.body.user &&
-    password == request.body.password
-  ) {
+  if (user == request.params.user && password == request.params.password) {
     reply.status(200).send();
   } else {
     let errorResponse = {
@@ -20,13 +17,12 @@ fastify.post("/user", async (request, reply) => {
       status: 409,
       code: "errorCode",
       requestId: "requestId",
-      userMessage:
-        "Invalid user name and password.",
-      developerMessage: `The provided user ${request.body.user} and password cannot found.`,      
+      userMessage: "Invalid user name and password.",
+      developerMessage: `The provided user ${request.params.user} and password cannot found.`,
     };
     reply.status(409).send(errorResponse);
   }
-})
+});
 
 // Run the server!
 fastify.listen({ host: "::", port: 3000 }, function (err, address) {
