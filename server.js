@@ -2,6 +2,8 @@ const fastify = require("fastify")({
   logger: true,
 });
 
+fastify.register(require('@fastify/formbody'))
+
 // fastify.get("/", async (request, reply) => {
 //   return { hello: "world" };
 // });
@@ -27,10 +29,12 @@ fastify.get("/users/:user/:password", async (request, reply) => {
   }
 });
 
-fastify.post("/users/:user/:password", async (request, reply) => {  
+fastify.post("/users/", async (request, reply) => {  
+  // console.log(`USER: ${request.body.user}`)
+  // console.log(`PASSWORD: ${request.body.password}`)
   let user = "user1";
   let password = "password123";
-  if (user == request.params.user && password == request.params.password) {
+  if (user == request.body.user && password == request.body.password) {
     reply.status(200).send();
   } else {
     let errorResponse = {
