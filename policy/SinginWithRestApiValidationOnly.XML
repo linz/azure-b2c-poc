@@ -57,29 +57,9 @@
                     <UserInputType>Password</UserInputType>
                 </ClaimType>
 
-                <ClaimType Id="isValidUser">
-                    <DataType>boolean</DataType>
-                </ClaimType>
-
-                <ClaimType Id="url">
-                    <DataType>string</DataType>
-                </ClaimType>
-
             </ClaimsSchema>
 
-            <ClaimsTransformations>
-                <ClaimsTransformation Id="GenerateUrl" TransformationMethod="FormatStringMultipleClaims">
-                    <InputClaims>
-                        <InputClaim ClaimTypeReferenceId="userName" TransformationClaimType="inputClaim1"/>
-                        <InputClaim ClaimTypeReferenceId="Password" TransformationClaimType="inputClaim2"/>
-                    </InputClaims>
-                    <InputParameters>
-                        <InputParameter Id="stringFormat" DataType="string" Value="https://mockuserstore-jweng.b4a.run/users/{0}/{1}"/>
-                    </InputParameters>
-                    <OutputClaims>
-                      <OutputClaim ClaimTypeReferenceId="url" TransformationClaimType="outputClaim"/>
-                    </OutputClaims>
-                </ClaimsTransformation>
+            <ClaimsTransformations> 
 
                 <ClaimsTransformation Id="GenerateRandomObjectIdTransformation" TransformationMethod="CreateRandomString">
                     <InputParameters>
@@ -268,6 +248,8 @@
                     <!-- <OutputClaim ClaimTypeReferenceId="displayName"/>
                     <OutputClaim ClaimTypeReferenceId="message"/> -->
                     <OutputClaim ClaimTypeReferenceId="userName"/>
+                    <OutputClaim ClaimTypeReferenceId="givenName"/>
+                    <OutputClaim ClaimTypeReferenceId="surname"/>
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>

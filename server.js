@@ -26,6 +26,7 @@ fastify.get("/users/:user/:password", async (request, reply) => {
   }
 });
 
+
 fastify.post("/users", async (request, reply) => {
   // console.log(`user: ${request.body.user}`);
   // console.log(`pwd: ${request.body.password}`);
@@ -36,9 +37,10 @@ fastify.post("/users", async (request, reply) => {
       obj.password === request.body.password
     );
   });
-
+  
   if (found) {
-    reply.status(200).send();
+    const result = { givenName: found.givenName, surname: found.surname}
+    reply.status(200).send(result);
   } else {
     let errorResponse = {
       version: "1.0",
