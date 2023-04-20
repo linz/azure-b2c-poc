@@ -29,7 +29,7 @@ fastify.get("/users/:user/:password", async (request, reply) => {
   }
 });
 
-fastify.post("/users/", async (request, reply) => {  
+fastify.post("/users", async (request, reply) => {  
   // console.log(`USER: ${request.body.user}`)
   // console.log(`PASSWORD: ${request.body.password}`)
   let user = "user1";
