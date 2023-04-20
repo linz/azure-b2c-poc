@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <!-- Collecti User input-->
+    <TrustFrameworkPolicy
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+      PolicySchemaVersion="0.3.0.0"
+      TenantId="devoio.onmicrosoft.com"
+      PolicyId="B2C_1A_ApiValidationCustomPolicy"
+      PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_ApiValidationCustomPolicy">
+
+        <BuildingBlocks>
+            <!-- Building Blocks Here-->
+            <ClaimsSchema>
+                <ClaimType Id="objectId">
+                    <DisplayName>unique object Id for subject of the claims being returned</DisplayName>
+                    <DataType>string</DataType>
+                </ClaimType> 
+
+                <ClaimType Id="message">
+                    <DisplayName>Will hold Hello World message</DisplayName>
+                    <DataType>string</DataType>
+                </ClaimType>
+
+                <ClaimType Id="givenName">
+                    <DisplayName>Given Name</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>Your given name (also known as first name).</UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
+                </ClaimType>
+
+                <ClaimType Id="surname">
+                    <DisplayName>Surname</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>Your surname (also known as family name or last name).</UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
+                </ClaimType>
+                
+                <ClaimType Id="displayName">
+                    <DisplayName>Display Name</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>Your display name.</UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
+                </ClaimType>
+
+                <ClaimType Id="userName">
+                    <DisplayName>User Name</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>LINZ user name.</UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
+                </ClaimType>
+
+                <ClaimType Id="password">
+                    <DisplayName>Password</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>LINZ password.</UserHelpText>
+                    <UserInputType>Password</UserInputType>
+                </ClaimType>
+
+                <ClaimType Id="isValidUser">
+                    <DataType>boolean</DataType>
+                </ClaimType>
+
+                <ClaimType Id="url">
+                    <DataType>string</DataType>
+                </ClaimType>
+
+            </ClaimsSchema>
+
+            <ClaimsTransformations>
+                <ClaimsTransformation Id="GenerateUrl" TransformationMethod="FormatStringMultipleClaims">
+                    <InputClaims>
+                        <InputClaim ClaimTypeReferenceId="userName" TransformationClaimType="inputClaim1"/>
+                        <InputClaim ClaimTypeReferenceId="Password" TransformationClaimType="inputClaim2"/>
+                    </InputClaims>
+                    <InputParameters>
+                        <InputParameter Id="stringFormat" DataType="string" Value="https://mockuserstore-jweng.b4a.run/users/{0}/{1}"/>
+                    </InputParameters>
+                    <OutputClaims>
+                      <OutputClaim ClaimTypeReferenceId="url" TransformationClaimType="outputClaim"/>
+                    </OutputClaims>
+                </ClaimsTransformation>
+
+                <ClaimsTransformation Id="GenerateRandomObjectIdTransformation" TransformationMethod="CreateRandomString">
+                    <InputParameters>
+                    <InputParameter Id="randomGeneratorType" DataType="string" Value="GUID"/>
+                    </InputParameters>
+                    <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="objectId" TransformationClaimType="outputClaim"/>
+                    </OutputClaims>
+                </ClaimsTransformation>
+
+                <ClaimsTransformation Id="CreateDisplayNameTransformation" TransformationMethod="FormatStringMultipleClaims">
+                    <InputClaims>
+                        <InputClaim ClaimTypeReferenceId="givenName" TransformationClaimType="inputClaim1"/>
+                        <InputClaim ClaimTypeReferenceId="surname" TransformationClaimType="inputClaim2"/>
+                    </InputClaims>
+                    <InputParameters>
+                        <InputParameter Id="stringFormat" DataType="string" Value="{0} {1}"/>
+                    </InputParameters>
+                    <OutputClaims>
+                      <OutputClaim ClaimTypeReferenceId="displayName" TransformationClaimType="outputClaim"/>
+                    </OutputClaims>
+                </ClaimsTransformation>
+
+                <ClaimsTransformation Id="CreateMessageTransformation" TransformationMethod="FormatStringClaim">
+                    <InputClaims>
+                    <InputClaim ClaimTypeReferenceId="displayName" TransformationClaimType="inputClaim"/>
+                    </InputClaims>
+                    <InputParameters>
+                    <InputParameter Id="stringFormat" DataType="string" Value="Hello {0}"/>
+                    </InputParameters>
+                    <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="message" TransformationClaimType="outputClaim"/>
+                    </OutputClaims>
+                </ClaimsTransformation>
+            </ClaimsTransformations>
+
+            <ContentDefinitions>
+                <ContentDefinition Id="SelfAssertedContentDefinition">
+                    <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri>
+                    <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+                    <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+                </ContentDefinition>
+            </ContentDefinitions>
+        </BuildingBlocks>
+
+        <ClaimsProviders>
+            <ClaimsProvider>
+                <DisplayName>Token Issuer</DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="JwtIssuer">
+                    <DisplayName>JWT Issuer</DisplayName>
+                    <Protocol Name="None" />
+                    <OutputTokenFormat>JWT</OutputTokenFormat>
+                    <Metadata>
+                        <Item Key="client_id">{service:te}</Item>
+                        <Item Key="issuer_refresh_token_user_identity_claim_type">objectId</Item>
+                        <Item Key="SendTokenResponseBodyWithJsonNumbers">true</Item>
+                    </Metadata>
+                    <CryptographicKeys>
+                        <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+                        <Key Id="issuer_refresh_token_key" StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
+                    </CryptographicKeys>
+                    </TechnicalProfile>
+                </TechnicalProfiles>
+            </ClaimsProvider>
+
+            <ClaimsProvider>
+                <!-- The technical profile(s) defined in this section is required by the framework to be included in all custom policies. -->
+                <DisplayName>Trustframework Policy Engine TechnicalProfiles</DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="TpEngine_c3bd4fe2-1775-4013-b91d-35f16d377d13">
+                    <DisplayName>Trustframework Policy Engine Default Technical Profile</DisplayName>
+                    <Protocol Name="None" />
+                    <Metadata>
+                        <Item Key="url">{service:te}</Item>
+                    </Metadata>
+                    </TechnicalProfile>
+                </TechnicalProfiles>
+            </ClaimsProvider>
+
+            <ClaimsProvider>
+                <DisplayName>Technical Profiles to generate claims</DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="ClaimGenerator">
+                        <DisplayName>Generate Object ID, displayName and message Claims Technical Profile.</DisplayName>
+                        <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+                        <OutputClaims>
+                            <OutputClaim ClaimTypeReferenceId="objectId"/>
+                            <!-- <OutputClaim ClaimTypeReferenceId="displayName"/>
+                            <OutputClaim ClaimTypeReferenceId="message"/> -->
+                        </OutputClaims>
+                        <OutputClaimsTransformations>
+                            <OutputClaimsTransformation ReferenceId="GenerateRandomObjectIdTransformation"/>
+                            <!-- <OutputClaimsTransformation ReferenceId="CreateDisplayNameTransformation"/>
+                            <OutputClaimsTransformation ReferenceId="CreateMessageTransformation"/> -->
+                        </OutputClaimsTransformations>
+                    </TechnicalProfile>
+                </TechnicalProfiles>
+            </ClaimsProvider>
+
+            <ClaimsProvider>
+                <DisplayName>Technical Profiles to collect user's details </DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="UserInformationCollector">
+                        <DisplayName>Collect User Input Technical Profile</DisplayName>
+                        <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+                        <Metadata>
+                            <Item Key="ContentDefinitionReferenceId">SelfAssertedContentDefinition</Item>
+                        </Metadata>
+                        <DisplayClaims>
+                            <DisplayClaim ClaimTypeReferenceId="userName" Required="true"/>
+                            <DisplayClaim ClaimTypeReferenceId="password" Required="true"/>
+                        </DisplayClaims>
+                        <OutputClaims>
+                            <OutputClaim ClaimTypeReferenceId="userName"/>
+                            <OutputClaim ClaimTypeReferenceId="password"/>
+                        </OutputClaims>
+                        <ValidationTechnicalProfiles>
+                            <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
+                        </ValidationTechnicalProfiles>
+                         <!-- <EnabledForUserJourneys>OnClaimsExistence</EnabledForUserJourneys> -->
+                    </TechnicalProfile>
+                </TechnicalProfiles>
+            </ClaimsProvider>
+
+            <ClaimsProvider>
+                <DisplayName>HTTP Request Technical Profiles</DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="ValidateUserViaHttp">
+                        <DisplayName>Check that the user has entered a valid user and password</DisplayName>
+                        <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+                        <Metadata>
+                            <Item Key="ServiceUrl">https://mockuserstore-jweng.b4a.run/users</Item>
+                            <Item Key="SendClaimsIn">Body</Item>
+                            <Item Key="AuthenticationType">None</Item>
+                            <Item Key="AllowInsecureAuthInProduction">true</Item>                        
+                        </Metadata>
+                        <InputClaims>
+                            <InputClaim ClaimTypeReferenceId="userName" PartnerClaimType="user"/>
+                            <InputClaim ClaimTypeReferenceId="password" PartnerClaimType="password"/>
+                        </InputClaims>                              
+                    </TechnicalProfile>
+                </TechnicalProfiles>
+            </ClaimsProvider>
+        </ClaimsProviders>
+
+        <UserJourneys>
+            <!-- User Journeys Here-->
+            <UserJourney Id="HelloWorldJourney">
+                <OrchestrationSteps>
+                    <OrchestrationStep Order="1" Type="ClaimsExchange">
+                        <ClaimsExchanges>
+                            <ClaimsExchange Id="GetUserInformationClaimsExchange" TechnicalProfileReferenceId="UserInformationCollector"/>
+                        </ClaimsExchanges>
+                    </OrchestrationStep>
+
+                    <OrchestrationStep Order="2" Type="ClaimsExchange">
+                        <ClaimsExchanges>
+                            <ClaimsExchange Id="GetMessageClaimsExchange" TechnicalProfileReferenceId="ClaimGenerator"/>
+                        </ClaimsExchanges>
+                    </OrchestrationStep>
+                    
+                    <!-- <OrchestrationStep Order="3" Type="ClaimsExchange">
+                        <ClaimsExchanges>
+                            <ClaimsExchange Id="CheckUserClaimsExchange" TechnicalProfileReferenceId="ValidateUserViaHttp"/>
+                        </ClaimsExchanges>                     
+                    </OrchestrationStep> -->
+
+                    <OrchestrationStep Order="3" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+                </OrchestrationSteps>
+            </UserJourney>
+        </UserJourneys>
+
+        <RelyingParty>
+            <!-- 
+                Relying Party Here that's your policy’s entry point
+                Specify the User Journey to execute 
+                Specify the claims to include in the token that is returned when the policy runs
+            -->
+            <DefaultUserJourney ReferenceId="HelloWorldJourney"/>
+            <TechnicalProfile Id="HelloWorldPolicyProfile">
+                <DisplayName>Hello World Policy Profile</DisplayName>
+                <Protocol Name="OpenIdConnect" />
+                <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
+                    <!-- <OutputClaim ClaimTypeReferenceId="displayName"/>
+                    <OutputClaim ClaimTypeReferenceId="message"/> -->
+                    <OutputClaim ClaimTypeReferenceId="userName"/>
+                </OutputClaims>
+                <SubjectNamingInfo ClaimType="sub" />
+            </TechnicalProfile>
+        </RelyingParty>
+    </TrustFrameworkPolicy>
