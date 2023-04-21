@@ -51,7 +51,7 @@ fastify.post("/users", async (request, reply) => {
   }
 
   if (found) {
-    const result = { givenName: found.givenName, surname: found.surname}
+    const result = { givenName: found.givenName, surname: found.surname, email: found.email}
     reply.status(200).send(result);
   } else {
     let errorResponse = {
