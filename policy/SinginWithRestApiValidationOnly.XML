@@ -57,6 +57,19 @@
                     <UserInputType>Password</UserInputType>
                 </ClaimType>
 
+                <ClaimType Id="email">
+                    <DisplayName>Email Address</DisplayName>
+                    <DataType>string</DataType>
+                    <DefaultPartnerClaimTypes>
+                        <Protocol Name="OpenIdConnect" PartnerClaimType="email"/>
+                    </DefaultPartnerClaimTypes>
+                    <UserHelpText>Your email address. </UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
+                    <Restriction>
+                        <Pattern RegularExpression="^[a-zA-Z0-9.!#$%&amp;&apos;^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" HelpText="Please enter a valid email address something like maurice@contoso.com"/>
+                    </Restriction>
+                </ClaimType>
+
             </ClaimsSchema>
 
             <ClaimsTransformations> 
@@ -150,6 +163,7 @@
                             <OutputClaim ClaimTypeReferenceId="objectId"/>
                             <OutputClaim ClaimTypeReferenceId="givenName"/>
                             <OutputClaim ClaimTypeReferenceId="surname"/>
+                            <OutputClaim ClaimTypeReferenceId="email"/>
                         </OutputClaims>
                         <OutputClaimsTransformations>
                             <OutputClaimsTransformation ReferenceId="GenerateRandomObjectIdTransformation"/>
@@ -178,6 +192,7 @@
                             <OutputClaim ClaimTypeReferenceId="password"/>
                             <OutputClaim ClaimTypeReferenceId="givenName"/>
                             <OutputClaim ClaimTypeReferenceId="surname"/>
+                            <OutputClaim ClaimTypeReferenceId="email"/>
                         </OutputClaims>
                         <ValidationTechnicalProfiles>
                             <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
@@ -206,6 +221,7 @@
                         <OutputClaims>
                             <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="givenName"/>
                             <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="surname"/>
+                            <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email"/>
                         </OutputClaims>                              
                     </TechnicalProfile>
                 </TechnicalProfiles>
@@ -257,6 +273,7 @@
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
                     <OutputClaim ClaimTypeReferenceId="displayName"/>
+                    <OutputClaim ClaimTypeReferenceId="email"/>
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
