@@ -1,7 +1,7 @@
 const users = [
   {
     user: "user1",
-    password: "password123",
+    password: "Password123",
     givenName: "Xyle",
     surname: "Doe",
     status: "locked",
@@ -9,7 +9,7 @@ const users = [
   },
   {
     user: "userx",
-    password: "password123x",
+    password: "Password123x",
     givenName: "John",
     surname: "Conner",
     status: "active",
@@ -17,7 +17,7 @@ const users = [
   },
   {
     user: "usery",
-    password: "password123y",
+    password: "Password123y",
     givenName: "Ola",
     surname: "Smith",
     status: "active",
@@ -25,7 +25,7 @@ const users = [
   },
   {
     user: "userz",
-    password: "password123z",
+    password: "Password123z",
     givenName: "Juan",
     surname: "Manuel",
     status: "active",
