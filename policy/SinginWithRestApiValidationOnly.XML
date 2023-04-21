@@ -148,13 +148,13 @@
                         <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
                         <OutputClaims>
                             <OutputClaim ClaimTypeReferenceId="objectId"/>
-                            <!-- <OutputClaim ClaimTypeReferenceId="displayName"/>
-                            <OutputClaim ClaimTypeReferenceId="message"/> -->
+                            <OutputClaim ClaimTypeReferenceId="givenName"/>
+                            <OutputClaim ClaimTypeReferenceId="surname"/>
                         </OutputClaims>
                         <OutputClaimsTransformations>
                             <OutputClaimsTransformation ReferenceId="GenerateRandomObjectIdTransformation"/>
-                            <!-- <OutputClaimsTransformation ReferenceId="CreateDisplayNameTransformation"/>
-                            <OutputClaimsTransformation ReferenceId="CreateMessageTransformation"/> -->
+                            <OutputClaimsTransformation ReferenceId="CreateDisplayNameTransformation"/>
+                            <!-- <OutputClaimsTransformation ReferenceId="CreateMessageTransformation"/> -->
                         </OutputClaimsTransformations>
                     </TechnicalProfile>
                 </TechnicalProfiles>
@@ -176,6 +176,8 @@
                         <OutputClaims>
                             <OutputClaim ClaimTypeReferenceId="userName"/>
                             <OutputClaim ClaimTypeReferenceId="password"/>
+                            <OutputClaim ClaimTypeReferenceId="givenName"/>
+                            <OutputClaim ClaimTypeReferenceId="surname"/>
                         </OutputClaims>
                         <ValidationTechnicalProfiles>
                             <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
@@ -195,12 +197,16 @@
                             <Item Key="ServiceUrl">https://mockuserstore-jweng.b4a.run/users</Item>
                             <Item Key="SendClaimsIn">Body</Item>
                             <Item Key="AuthenticationType">None</Item>
-                            <Item Key="AllowInsecureAuthInProduction">true</Item>                        
+                            <Item Key="AllowInsecureAuthInProduction">true</Item>                       
                         </Metadata>
                         <InputClaims>
                             <InputClaim ClaimTypeReferenceId="userName" PartnerClaimType="user"/>
                             <InputClaim ClaimTypeReferenceId="password" PartnerClaimType="password"/>
-                        </InputClaims>                              
+                        </InputClaims>  
+                        <OutputClaims>
+                            <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="givenName"/>
+                            <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="surname"/>
+                        </OutputClaims>                              
                     </TechnicalProfile>
                 </TechnicalProfiles>
             </ClaimsProvider>
@@ -250,6 +256,7 @@
                     <OutputClaim ClaimTypeReferenceId="userName"/>
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
+                    <OutputClaim ClaimTypeReferenceId="displayName"/>
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
