@@ -38,6 +38,18 @@ fastify.post("/users", async (request, reply) => {
     );
   });
   
+  if(found.status == "locked"){
+    let errorResponse = {
+      version: "1.0",
+      status: 409,
+      code: "errorCode",
+      requestId: "requestId",
+      userMessage: "LINZ User is locked.",
+      developerMessage: `The user: ${request.body.user} has status locked`,
+    };
+    reply.status(409).send(errorResponse);
+  }
+
   if (found) {
     const result = { givenName: found.givenName, surname: found.surname}
     reply.status(200).send(result);
@@ -48,7 +60,7 @@ fastify.post("/users", async (request, reply) => {
       code: "errorCode",
       requestId: "requestId",
       userMessage: "Invalid LINZ user name and password.",
-      developerMessage: `The provided user ${request.params.user} and password cannot found.`,
+      developerMessage: `The provided user ${request.body.user} and password cannot found.`,
     };
     reply.status(409).send(errorResponse);
   }
