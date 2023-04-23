@@ -37,7 +37,17 @@ fastify.post("/users", async (request, reply) => {
       obj.password === request.body.password
     );
   });
-  
+  if(found.status == "inactive"){
+    let errorResponse = {
+      version: "1.0",
+      status: 409,
+      code: "errorCode",
+      requestId: "requestId",
+      userMessage: "LINZ User is inactive.",
+      developerMessage: `The user: ${request.body.user} has status inactive`,
+    };
+    reply.status(409).send(errorResponse);
+  }
   if(found.status == "locked"){
     let errorResponse = {
       version: "1.0",

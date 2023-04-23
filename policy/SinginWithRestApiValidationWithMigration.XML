@@ -215,7 +215,6 @@
                         </OutputClaims>
                         <ValidationTechnicalProfiles>
                             <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
-                            <ValidationTechnicalProfile ReferenceId="UserInputDisplayNameGenerator"/> 
                         </ValidationTechnicalProfiles>
                          <!-- <EnabledForUserJourneys>OnClaimsExistence</EnabledForUserJourneys> -->
                     </TechnicalProfile>
@@ -317,11 +316,17 @@
 
                     <OrchestrationStep Order="3" Type="ClaimsExchange">
                         <ClaimsExchanges>
+                            <ClaimsExchange Id="DisplayeClaimsExchange" TechnicalProfileReferenceId="UserInputDisplayNameGenerator"/>
+                        </ClaimsExchanges>
+                    </OrchestrationStep>
+
+                    <OrchestrationStep Order="4" Type="ClaimsExchange">
+                        <ClaimsExchanges>
                             <ClaimsExchange Id="MigrateClaimsExchange" TechnicalProfileReferenceId="AAD-UserWrite"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
-                    <OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+                    <OrchestrationStep Order="5" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
                 </OrchestrationSteps>
             </UserJourney>
         </UserJourneys>
@@ -337,12 +342,12 @@
                 <DisplayName>Hello World Policy Profile</DisplayName>
                 <Protocol Name="OpenIdConnect" />
                 <OutputClaims>
-                    <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
-                    <!-- <OutputClaim ClaimTypeReferenceId="displayName"/>                     -->
+                    <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>                                 
                     <OutputClaim ClaimTypeReferenceId="userName"/>
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
                     <OutputClaim ClaimTypeReferenceId="email"/>
+                    <OutputClaim ClaimTypeReferenceId="displayName"/>      
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>

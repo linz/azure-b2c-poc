@@ -12,7 +12,7 @@ const users = [
     password: "Password123x",
     givenName: "John",
     surname: "Conner",
-    status: "active",
+    status: "inactive",
     email: "userx@outlook.com"
   },
   {
