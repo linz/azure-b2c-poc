@@ -6,8 +6,8 @@
       xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
       PolicySchemaVersion="0.3.0.0"
       TenantId="devoio.onmicrosoft.com"
-      PolicyId="B2C_1A_ApiValidationMigrationCustomPolicy"
-      PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_ApiValidationMigrationCustomPolicy">
+      PolicyId="B2C_1A_SignWithADDCustomPolicy"
+      PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_SignWithADDCustomPolicy">
 
         <BuildingBlocks>
             <!-- Building Blocks Here-->
@@ -209,7 +209,7 @@
                             <Item Key="ContentDefinitionReferenceId">SelfAssertedContentDefinition</Item>
                         </Metadata>
                         <DisplayClaims>
-                            <DisplayClaim ClaimTypeReferenceId="userName" Required="true"/>
+                            <DisplayClaim ClaimTypeReferenceId="email" Required="true"/>
                             <DisplayClaim ClaimTypeReferenceId="password" Required="true"/>
                         </DisplayClaims>
                         <OutputClaims>
@@ -219,39 +219,12 @@
                             <OutputClaim ClaimTypeReferenceId="surname"/>
                             <OutputClaim ClaimTypeReferenceId="email"/>
                         </OutputClaims>
-                        <ValidationTechnicalProfiles>
-                            <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
-                        </ValidationTechnicalProfiles>
+                        
                          <!-- <EnabledForUserJourneys>OnClaimsExistence</EnabledForUserJourneys> -->
                     </TechnicalProfile>
                 </TechnicalProfiles>
             </ClaimsProvider>
 
-            <ClaimsProvider>
-                <DisplayName>HTTP Request Technical Profiles</DisplayName>
-                <TechnicalProfiles>
-                    <TechnicalProfile Id="ValidateUserViaHttp">
-                        <DisplayName>Check that the user has entered a valid user and password</DisplayName>
-                        <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-                        <Metadata>
-                            <Item Key="ServiceUrl">https://mockuserstore-jweng.b4a.run/users</Item>
-                            <Item Key="SendClaimsIn">Body</Item>
-                            <Item Key="AuthenticationType">None</Item>
-                            <Item Key="AllowInsecureAuthInProduction">true</Item>                       
-                        </Metadata>
-                        <InputClaims>
-                            <InputClaim ClaimTypeReferenceId="userName" PartnerClaimType="user"/>
-                            <InputClaim ClaimTypeReferenceId="password" PartnerClaimType="password"/>
-                        </InputClaims>  
-                        <OutputClaims>
-                            <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="givenName"/>
-                            <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="surname"/>
-                            <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email"/>
-                            <OutputClaim ClaimTypeReferenceId="password" PartnerClaimType="password"/>
-                        </OutputClaims>                              
-                    </TechnicalProfile>
-                </TechnicalProfiles>
-            </ClaimsProvider>
 
             <ClaimsProvider>
                 <DisplayName>Azure AD Technical Profiles</DisplayName>
@@ -337,44 +310,13 @@
 
                     <OrchestrationStep Order="2" Type="ClaimsExchange">
                         <ClaimsExchanges>
-                            <ClaimsExchange Id="DisplayeClaimsExchange" TechnicalProfileReferenceId="UserInputDisplayNameGenerator"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep>
-
-                    <OrchestrationStep Order="3" Type="ClaimsExchange">
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="GetMessageClaimsExchange" TechnicalProfileReferenceId="UserInputMessageClaimGenerator"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep>
-
-                    <!-- Read or check if user exist then dont migrate -->
-                    <OrchestrationStep Order="4" Type="ClaimsExchange">
-                        <ClaimsExchanges>
                             <ClaimsExchange Id="AADUserReaderExchange" TechnicalProfileReferenceId="AAD-UserRead"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
-                   
-                    <OrchestrationStep Order="5" Type="ClaimsExchange">
-                        <Preconditions>
-                            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                                <Value>objectId</Value>
-                                <Action>SkipThisOrchestrationStep</Action>
-                            </Precondition>
-                        </Preconditions>
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="MigrateClaimsExchange" TechnicalProfileReferenceId="AAD-UserWrite"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep>
+ 
 
-                    <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
-
-                    <!-- Uset this display and move this button ORDER="X" to track check which  OrchestrationStep failed  -->
-                    <!-- <OrchestrationStep Order="4" Type="ClaimsExchange">
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="Displayecheck" TechnicalProfileReferenceId="displayButton"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep> -->
+                    <OrchestrationStep Order="3" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
 
                 </OrchestrationSteps>
             </UserJourney>
@@ -396,7 +338,7 @@
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
                     <OutputClaim ClaimTypeReferenceId="email"/>
-                    <OutputClaim ClaimTypeReferenceId="displayName"/>          
+                    <OutputClaim ClaimTypeReferenceId="displayName"/>           
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
