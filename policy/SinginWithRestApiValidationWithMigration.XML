@@ -81,6 +81,12 @@
                     <DataType>string</DataType>
                     <UserHelpText>Password policies used by Azure AD to determine password strength, expiry etc.</UserHelpText>
                 </ClaimType>
+
+                <ClaimType Id="displayButton">
+                    <DisplayName>Display Button</DisplayName>       
+                    <DataType>string</DataType>              
+                    <UserInputType>Button</UserInputType>                    
+                </ClaimType>
             </ClaimsSchema>
 
             <ClaimsTransformations> 
@@ -273,7 +279,7 @@
                             <OutputClaim ClaimTypeReferenceId="objectId" />
                             <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
                             <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" />
-                        </OutputClaims>
+                        </OutputClaims>                
                     </TechnicalProfile>
                     <TechnicalProfile Id="AAD-UserRead">
                         <DisplayName>Read user from Azure AD storage</DisplayName>
@@ -292,10 +298,30 @@
                             <OutputClaim ClaimTypeReferenceId="givenName"/>
                             <OutputClaim ClaimTypeReferenceId="surname"/>
                             <OutputClaim ClaimTypeReferenceId="displayName"/>
-                        </OutputClaims>
+                        </OutputClaims>                       
                     </TechnicalProfile>
                 </TechnicalProfiles>
             </ClaimsProvider>
+
+            <!-- TEST only -->
+            <ClaimsProvider>
+                <DisplayName>Technical Profiles to collect user's access code</DisplayName>
+                <TechnicalProfiles>
+                    <TechnicalProfile Id="displayButton">
+                        <DisplayName>Display Button</DisplayName>
+                        <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+                        <Metadata>
+                            <Item Key="ContentDefinitionReferenceId">SelfAssertedContentDefinition</Item>
+                        </Metadata>
+                        <DisplayClaims>
+                            <DisplayClaim ClaimTypeReferenceId="displayButton"/>
+                        </DisplayClaims>
+                    </TechnicalProfile>
+                     
+                </TechnicalProfiles>
+            </ClaimsProvider>
+             <!-- TEST only -->
+
         </ClaimsProviders>
 
         <UserJourneys>
@@ -310,23 +336,45 @@
 
                     <OrchestrationStep Order="2" Type="ClaimsExchange">
                         <ClaimsExchanges>
-                            <ClaimsExchange Id="GetMessageClaimsExchange" TechnicalProfileReferenceId="UserInputMessageClaimGenerator"/>
+                            <ClaimsExchange Id="DisplayeClaimsExchange" TechnicalProfileReferenceId="UserInputDisplayNameGenerator"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
                     <OrchestrationStep Order="3" Type="ClaimsExchange">
                         <ClaimsExchanges>
-                            <ClaimsExchange Id="DisplayeClaimsExchange" TechnicalProfileReferenceId="UserInputDisplayNameGenerator"/>
+                            <ClaimsExchange Id="GetMessageClaimsExchange" TechnicalProfileReferenceId="UserInputMessageClaimGenerator"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
+                    <!-- Read or check if user exist then dont migrate -->
                     <OrchestrationStep Order="4" Type="ClaimsExchange">
+                        <ClaimsExchanges>
+                            <ClaimsExchange Id="AADUserReaderExchange" TechnicalProfileReferenceId="AAD-UserRead"/>
+                        </ClaimsExchanges>
+                    </OrchestrationStep>
+
+                   
+                    <OrchestrationStep Order="5" Type="ClaimsExchange">
+                        <Preconditions>
+                            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+                                <Value>objectId</Value>
+                                <Action>SkipThisOrchestrationStep</Action>
+                            </Precondition>
+                        </Preconditions>
                         <ClaimsExchanges>
                             <ClaimsExchange Id="MigrateClaimsExchange" TechnicalProfileReferenceId="AAD-UserWrite"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
-                    <OrchestrationStep Order="5" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+                    <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+
+                    <!-- Uset this display and move this button ORDER="X" to track check which  OrchestrationStep failed  -->
+                    <!-- <OrchestrationStep Order="4" Type="ClaimsExchange">
+                        <ClaimsExchanges>
+                            <ClaimsExchange Id="Displayecheck" TechnicalProfileReferenceId="displayButton"/>
+                        </ClaimsExchanges>
+                    </OrchestrationStep> -->
+
                 </OrchestrationSteps>
             </UserJourney>
         </UserJourneys>
@@ -347,7 +395,8 @@
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
                     <OutputClaim ClaimTypeReferenceId="email"/>
-                    <OutputClaim ClaimTypeReferenceId="displayName"/>      
+                    <OutputClaim ClaimTypeReferenceId="displayName"/> 
+                    <OutputClaim ClaimTypeReferenceId="password"/>           
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
