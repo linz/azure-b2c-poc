@@ -73,7 +73,7 @@ const users = [
   },
   {
     user: "test10",
-    password: "B2ctest1234",
+    password: "B2ctest1234x",
     givenName: "Joe10",
     surname: "Smith10",
     status: "active",
