@@ -37,7 +37,7 @@ fastify.post("/users", async (request, reply) => {
       obj.password === request.body.password
     );
   });
-  if(found.status == "inactive"){
+  if(found.status == "inactive" && found){
     let errorResponse = {
       version: "1.0",
       status: 409,
@@ -48,7 +48,7 @@ fastify.post("/users", async (request, reply) => {
     };
     reply.status(409).send(errorResponse);
   }
-  if(found.status == "locked"){
+  if(found.status == "locked" && found){
     let errorResponse = {
       version: "1.0",
       status: 409,
