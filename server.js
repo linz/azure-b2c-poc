@@ -26,7 +26,6 @@ fastify.get("/users/:user/:password", async (request, reply) => {
   }
 });
 
-
 fastify.post("/users", async (request, reply) => {
   // console.log(`user: ${request.body.user}`);
   // console.log(`pwd: ${request.body.password}`);
@@ -37,31 +36,35 @@ fastify.post("/users", async (request, reply) => {
       obj.password === request.body.password
     );
   });
-  if(found.status == "inactive" && found){
-    let errorResponse = {
-      version: "1.0",
-      status: 409,
-      code: "errorCode",
-      requestId: "requestId",
-      userMessage: "LINZ User is inactive.",
-      developerMessage: `The user: ${request.body.user} has status inactive`,
-    };
-    reply.status(409).send(errorResponse);
-  }
-  if(found.status == "locked" && found){
-    let errorResponse = {
-      version: "1.0",
-      status: 409,
-      code: "errorCode",
-      requestId: "requestId",
-      userMessage: "LINZ User is locked.",
-      developerMessage: `The user: ${request.body.user} has status locked`,
-    };
-    reply.status(409).send(errorResponse);
-  }
 
   if (found) {
-    const result = { givenName: found.givenName, surname: found.surname, email: found.email}
+    if (found.status == "inactive") {
+      let errorResponse = {
+        version: "1.0",
+        status: 409,
+        code: "errorCode",
+        requestId: "requestId",
+        userMessage: "LINZ User is inactive.",
+        developerMessage: `The user: ${request.body.user} has status inactive`,
+      };
+      reply.status(409).send(errorResponse);
+    }
+    if (found.status == "locked") {
+      let errorResponse = {
+        version: "1.0",
+        status: 409,
+        code: "errorCode",
+        requestId: "requestId",
+        userMessage: "LINZ User is locked.",
+        developerMessage: `The user: ${request.body.user} has status locked`,
+      };
+      reply.status(409).send(errorResponse);
+    }
+    const result = {
+      givenName: found.givenName,
+      surname: found.surname,
+      email: found.email,
+    };
     reply.status(200).send(result);
   } else {
     let errorResponse = {
