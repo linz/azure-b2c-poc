@@ -364,7 +364,6 @@
                             <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="givenName"/>
                             <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="surname"/>
                             <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email"/>
-                            <OutputClaim ClaimTypeReferenceId="password" PartnerClaimType="password"/>
                         </OutputClaims>                              
                     </TechnicalProfile>
                 </TechnicalProfiles>
