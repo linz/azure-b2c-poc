@@ -389,7 +389,7 @@
                             <PersistedClaim ClaimTypeReferenceId="displayName" />
                             <PersistedClaim ClaimTypeReferenceId="givenName" />
                             <PersistedClaim ClaimTypeReferenceId="surname" />
-                            <PersistedClaim ClaimTypeReferenceId="password"/>
+                            <PersistedClaim ClaimTypeReferenceId="password" />
                             <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration,DisableStrongPassword" />
                         </PersistedClaims>
                         <OutputClaims>
