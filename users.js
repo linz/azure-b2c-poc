@@ -95,6 +95,14 @@ const users = [
     status: "active",
     email: "test13@outlook.com"
   },
+  {
+    user: "test14",
+    password: "B2ctest1234",
+    givenName: "Joe14",
+    surname: "Smith14",
+    status: "active",
+    email: "test14@outlook.com"
+  },
 ];
 
 exports.users = users;

@@ -338,6 +338,16 @@
                         </OutputClaims>
                         <ValidationTechnicalProfiles>
                             <ValidationTechnicalProfile ReferenceId="ValidateUserViaHttp"/>
+                            <ValidationTechnicalProfile ReferenceId="UserInputDisplayNameGenerator" />
+                            <ValidationTechnicalProfile ReferenceId="AAD-UserRead" />
+                            <ValidationTechnicalProfile ReferenceId="AAD-UserWrite" >
+                                <Preconditions>
+                                    <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+                                        <Value>objectId</Value>
+                                        <Action>SkipThisValidationTechnicalProfile</Action>
+                                    </Precondition>
+                                </Preconditions>
+                                </ValidationTechnicalProfile>
                         </ValidationTechnicalProfiles>
                          <!-- <EnabledForUserJourneys>OnClaimsExistence</EnabledForUserJourneys> -->
                     </TechnicalProfile>
@@ -450,10 +460,18 @@
                             <ClaimsExchange Id="GetUserInformationClaimsExchange" TechnicalProfileReferenceId="UserInformationCollector"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
-
+ 
+                    <!-- we just need this becuase the relying party needs the object ID and display name to be output claim,
+                    , but this will never be executed. as AAD-UserRead is already executed in the UserInformationCollector-->
                     <OrchestrationStep Order="2" Type="ClaimsExchange">
+                        <Preconditions>
+                                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+                                    <Value>objectId</Value>
+                                    <Action>SkipThisOrchestrationStep</Action>
+                                </Precondition>
+                            </Preconditions>
                         <ClaimsExchanges>
-                            <ClaimsExchange Id="DisplayeClaimsExchange" TechnicalProfileReferenceId="UserInputDisplayNameGenerator"/>
+                            <ClaimsExchange Id="AADUserReaderExchange" TechnicalProfileReferenceId="AAD-UserRead" />
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
@@ -463,35 +481,7 @@
                         </ClaimsExchanges>
                     </OrchestrationStep>
 
-                    <!-- Read or check if user exist then dont migrate -->
-                    <OrchestrationStep Order="4" Type="ClaimsExchange">
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="AADUserReaderExchange" TechnicalProfileReferenceId="AAD-UserRead"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep>
-
-                   
-                    <OrchestrationStep Order="5" Type="ClaimsExchange">
-                        <Preconditions>
-                            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                                <Value>objectId</Value>
-                                <Action>SkipThisOrchestrationStep</Action>
-                            </Precondition>
-                        </Preconditions>
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="MigrateClaimsExchange" TechnicalProfileReferenceId="AAD-UserWrite"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep>
-
-                    <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
-
-                    <!-- Uset this display and move this button ORDER="X" to track check which  OrchestrationStep failed  -->
-                    <!-- <OrchestrationStep Order="4" Type="ClaimsExchange">
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="Displayecheck" TechnicalProfileReferenceId="displayButton"/>
-                        </ClaimsExchanges>
-                    </OrchestrationStep> -->
-
+                    <OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
                 </OrchestrationSteps>
             </UserJourney>
         </UserJourneys>
@@ -508,12 +498,11 @@
                 <Protocol Name="OpenIdConnect" />
                 <OutputClaims>
                     <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>                                 
+                    <OutputClaim ClaimTypeReferenceId="displayName"/>
                     <OutputClaim ClaimTypeReferenceId="userName"/>
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
-                    <OutputClaim ClaimTypeReferenceId="email"/>
-                    <OutputClaim ClaimTypeReferenceId="displayName"/>
-                    <OutputClaim ClaimTypeReferenceId="password"/>          
+                    <OutputClaim ClaimTypeReferenceId="email"/>                             
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
