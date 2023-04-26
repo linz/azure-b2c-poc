@@ -443,20 +443,6 @@
                             <ClaimsExchange Id="GetUserInformationClaimsExchange" TechnicalProfileReferenceId="UserInformationCollector"/>
                         </ClaimsExchanges>
                     </OrchestrationStep>
- 
-                    <!-- we just need this becuase the relying party needs the object ID and display name to be output claim,
-                    , but this will never be executed. as AAD-UserRead is already executed in the UserInformationCollector-->
-                    <!-- <OrchestrationStep Order="2" Type="ClaimsExchange">
-                        <Preconditions>
-                                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                                    <Value>objectId</Value>
-                                    <Action>SkipThisOrchestrationStep</Action>
-                                </Precondition>
-                            </Preconditions>
-                        <ClaimsExchanges>
-                            <ClaimsExchange Id="AADUserReaderExchange" TechnicalProfileReferenceId="AAD-UserRead" />
-                        </ClaimsExchanges>
-                    </OrchestrationStep> -->
 
                     <OrchestrationStep Order="2" Type="ClaimsExchange">
                         <ClaimsExchanges>
