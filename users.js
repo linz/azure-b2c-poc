@@ -119,7 +119,6 @@ const users = [
     status: "active",
     email: "test15@outlook.com"
   },
-  ,
   {
     user: "test17",
     password: "B2ctest1234",
