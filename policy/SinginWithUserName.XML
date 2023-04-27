@@ -95,10 +95,10 @@
                     <UserInputType>Button</UserInputType>                    
                 </ClaimType>
 
-                <ClaimType Id="extension_loyaltyId">
-                    <DisplayName>Loyalty Identification</DisplayName>
+                <ClaimType Id="extension_linzEmail">
+                    <DisplayName>Linz email</DisplayName>
                     <DataType>string</DataType>
-                    <UserHelpText>Your loyalty number from your membership card</UserHelpText>
+                    <UserHelpText>Linz email address</UserHelpText>
                     <UserInputType>TextBox</UserInputType>
                 </ClaimType>
             </ClaimsSchema>
