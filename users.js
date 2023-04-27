@@ -1,11 +1,19 @@
 const users = [
   {
+    user: "jweng",
+    password: "B2ctest1234",
+    givenName: "Jackie 3",
+    surname: "Weng",
+    status: "active",
+    email: "test15@outlook.com",
+  },
+  {
     user: "user1",
     password: "Password123",
     givenName: "Xyle",
     surname: "Doe",
     status: "locked",
-    email: "user1@outlook.com"
+    email: "user1@outlook.com",
   },
   {
     user: "userx",
@@ -13,7 +21,7 @@ const users = [
     givenName: "John",
     surname: "Conner",
     status: "inactive",
-    email: "userx@outlook.com"
+    email: "userx@outlook.com",
   },
   {
     user: "usery",
@@ -21,7 +29,7 @@ const users = [
     givenName: "Ola",
     surname: "Smith",
     status: "active",
-    email: "usery@outlook.com"
+    email: "usery@outlook.com",
   },
   {
     user: "userz",
@@ -29,7 +37,7 @@ const users = [
     givenName: "Juan",
     surname: "Manuel",
     status: "active",
-    email: "usery@outlook.com"
+    email: "usery@outlook.com",
   },
   {
     user: "test5",
@@ -37,7 +45,7 @@ const users = [
     givenName: "Joe",
     surname: "Smith5",
     status: "active",
-    email: "test5@outlook.com"
+    email: "test5@outlook.com",
   },
   {
     user: "test6",
@@ -45,7 +53,7 @@ const users = [
     givenName: "Joe6",
     surname: "Smith6",
     status: "active",
-    email: "test6@outlook.com"
+    email: "test6@outlook.com",
   },
   {
     user: "test7",
@@ -53,7 +61,7 @@ const users = [
     givenName: "Joe7",
     surname: "Smith7",
     status: "active",
-    email: "test7@outlook.com"
+    email: "test7@outlook.com",
   },
   {
     user: "test8",
@@ -61,7 +69,7 @@ const users = [
     givenName: "Joe8",
     surname: "Smith8",
     status: "active",
-    email: "test8@outlook.com"
+    email: "test8@outlook.com",
   },
   {
     user: "test9",
@@ -69,7 +77,7 @@ const users = [
     givenName: "Joe9",
     surname: "Smith9",
     status: "active",
-    email: "test9@outlook.com"
+    email: "test9@outlook.com",
   },
   {
     user: "test10",
@@ -77,7 +85,7 @@ const users = [
     givenName: "Joe10",
     surname: "Smith10",
     status: "active",
-    email: "test10@outlook.com"
+    email: "test10@outlook.com",
   },
   {
     user: "test11",
@@ -85,7 +93,7 @@ const users = [
     givenName: "Joe11",
     surname: "Smith11",
     status: "active",
-    email: "test11@outlook.com"
+    email: "test11@outlook.com",
   },
   {
     user: "test13",
@@ -93,7 +101,7 @@ const users = [
     givenName: "Joe13",
     surname: "Smith13",
     status: "active",
-    email: "test13@outlook.com"
+    email: "test13@outlook.com",
   },
   {
     user: "test14",
@@ -101,7 +109,7 @@ const users = [
     givenName: "Joe14",
     surname: "Smith14",
     status: "active",
-    email: "test14@outlook.com"
+    email: "test14@outlook.com",
   },
   {
     user: "test15",
@@ -109,7 +117,7 @@ const users = [
     givenName: "Joe15",
     surname: "Smith15",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test16",
@@ -117,7 +125,7 @@ const users = [
     givenName: "Joe16",
     surname: "Smith16",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test17",
@@ -125,7 +133,7 @@ const users = [
     givenName: "Joe17",
     surname: "Smith17",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test18",
@@ -133,7 +141,7 @@ const users = [
     givenName: "Joe18",
     surname: "Smith18",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test19",
@@ -141,7 +149,7 @@ const users = [
     givenName: "Joe19",
     surname: "Smith19",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test20",
@@ -149,7 +157,7 @@ const users = [
     givenName: "Joe20",
     surname: "Smith20",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
   {
     user: "test21",
