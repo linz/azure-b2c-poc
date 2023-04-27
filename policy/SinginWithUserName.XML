@@ -9,6 +9,11 @@
       PolicyId="B2C_1A_UserNameCustomPolicy"
       PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_UserNameCustomPolicy">
 
+        <BasePolicy>
+            <TenantId>devoio.onmicrosoft.com</TenantId>
+             <PolicyId>B2C_1A_TrustFrameworkBase</PolicyId>
+        </BasePolicy>
+
         <BuildingBlocks>
             <!-- Building Blocks Here-->
             <ClaimsSchema>
@@ -88,6 +93,13 @@
                     <DisplayName>Display Button</DisplayName>       
                     <DataType>string</DataType>              
                     <UserInputType>Button</UserInputType>                    
+                </ClaimType>
+
+                <ClaimType Id="extension_loyaltyId">
+                    <DisplayName>Loyalty Identification</DisplayName>
+                    <DataType>string</DataType>
+                    <UserHelpText>Your loyalty number from your membership card</UserHelpText>
+                    <UserInputType>TextBox</UserInputType>
                 </ClaimType>
             </ClaimsSchema>
 
@@ -392,6 +404,8 @@
                             <Item Key="Operation">Write</Item>
                             <Item Key="RaiseErrorIfClaimsPrincipalAlreadyExists">true</Item>
                             <Item Key="UserMessageIfClaimsPrincipalAlreadyExists">The account already exists. Try to create another account</Item>
+                            <Item Key="ClientId">6f3c765b-b903-4cc4-9b0d-32cfb31fbfb8</Item>
+                            <Item Key="ApplicationObjectId">740647d6-0161-4fc3-8d31-a384e58975fe</Item>
                         </Metadata>
                         <InputClaims>
                             <InputClaim ClaimTypeReferenceId="userName" PartnerClaimType="signInNames.userName" Required="true" />
@@ -403,6 +417,7 @@
                             <PersistedClaim ClaimTypeReferenceId="surname" />
                             <PersistedClaim ClaimTypeReferenceId="password" />
                             <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="otherMails" />     
+                            <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="extension_linzEmail" />   
                             <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration,DisableStrongPassword" />
                         </PersistedClaims>
                         <OutputClaims>
@@ -472,7 +487,8 @@
                     <OutputClaim ClaimTypeReferenceId="userName"/>
                     <OutputClaim ClaimTypeReferenceId="givenName"/>
                     <OutputClaim ClaimTypeReferenceId="surname"/>
-                    <OutputClaim ClaimTypeReferenceId="email"/>                             
+                    <OutputClaim ClaimTypeReferenceId="email"/>      
+                    <!-- <OutputClaim ClaimTypeReferenceId="extension_linzEmail"/>                        -->
                 </OutputClaims>
                 <SubjectNamingInfo ClaimType="sub" />
             </TechnicalProfile>
