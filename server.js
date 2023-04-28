@@ -30,12 +30,14 @@ fastify.post("/users", async (request, reply) => {
   // console.log(`user: ${request.body.user}`);
   // console.log(`pwd: ${request.body.password}`);
 
-  const found = users.find((obj) => {
-    return (
-      obj.user === request.body.user.toLowerCase() &&
-      obj.password === request.body.password
-    );
-  });
+  // const found = users.find((obj) => {
+  //   return (
+  //     obj.user === request.body.user.toLowerCase() &&
+  //     obj.password === request.body.password
+  //   );
+  // });
+
+  const found = findUser(request);
 
   if (found) {
     if (found.status == "inactive") {
@@ -79,6 +81,15 @@ fastify.post("/users", async (request, reply) => {
   }
 });
 
+fastify.put("/users/changePassword", async (requst, reply) => {
+  //const found = findUser();
+  const result = {
+    passwordChange: true,
+    Remarks: "Your password has been change.",
+  };
+  reply.status(200).send(result);
+});
+
 // Run the server!
 fastify.listen({ host: "::", port: 3000 }, function (err, address) {
   if (err) {
@@ -87,3 +98,13 @@ fastify.listen({ host: "::", port: 3000 }, function (err, address) {
   }
   // Server is now listening on ${address}
 });
+
+function findUser(request) {
+  return users.find((obj) => {
+    return (
+      obj.user === request.body.user.toLowerCase() &&
+      obj.password === request.body.password
+    );
+  });
+}
+
