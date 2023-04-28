@@ -81,7 +81,7 @@ fastify.post("/users", async (request, reply) => {
   }
 });
 
-fastify.put("/users/changePassword", async (requst, reply) => {
+fastify.post("/users/changePassword", async (requst, reply) => {
   //const found = findUser();
   const result = {
     passwordChange: true,
