@@ -44,7 +44,7 @@ const users = [
     password: "B2ctest1234",
     givenName: "Joe",
     surname: "Smith5",
-    status: "active",
+    status: "changePassword",
     email: "test5@outlook.com",
   },
   {
