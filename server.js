@@ -35,15 +35,6 @@ fastify.get("/users/:email", async (request, reply) => {
 });
 
 fastify.post("/users", async (request, reply) => {
-  // console.log(`user: ${request.body.user}`);
-  // console.log(`pwd: ${request.body.password}`);
-
-  // const found = users.find((obj) => {
-  //   return (
-  //     obj.user === request.body.user.toLowerCase() &&
-  //     obj.password === request.body.password
-  //   );
-  // });
 
   const found = findUser(request);
 
@@ -74,6 +65,7 @@ fastify.post("/users", async (request, reply) => {
       givenName: found.givenName,
       surname: found.surname,
       email: found.email,
+      status: found.status,
     };
     reply.status(200).send(result);
   } else {
