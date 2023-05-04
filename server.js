@@ -48,6 +48,7 @@ fastify.post("/users", async (request, reply) => {
         developerMessage: `The user: ${request.body.user} has status inactive`,
       };
       reply.status(409).send(errorResponse);
+      return
     }
     if (found.status == "locked") {
       let errorResponse = {
@@ -59,6 +60,7 @@ fastify.post("/users", async (request, reply) => {
         developerMessage: `The user: ${request.body.user} has status locked`,
       };
       reply.status(409).send(errorResponse);
+      return
     }
     const result = {
       givenName: found.givenName,
@@ -97,6 +99,7 @@ fastify.post("/users/changePassword", async (request, reply) => {
       developerMessage: `The provided user ${request.body.user} old password is not correct.`,
     };
     reply.status(409).send(errorResponse);
+    return;
   }
 
   if (request.body.oldPassword === request.body.newPassword) {
@@ -109,6 +112,7 @@ fastify.post("/users/changePassword", async (request, reply) => {
       developerMessage: `The provided user ${request.body.user} old password and new password are the same.`,
     };
     reply.status(409).send(errorResponse);
+    return;
   }
 
     //update user password
