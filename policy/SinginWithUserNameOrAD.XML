@@ -7,7 +7,7 @@
     PolicySchemaVersion="0.3.0.0"
     TenantId="devoio.onmicrosoft.com"
     PolicyId="B2C_1A_UserNameOrADCustomPolicy"
-    PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_UserNameOrADCustomPolicy">
+    PublicPolicyUri="http://devoio.onmicrosoft.com/B2C_1A_UserNameOrADCustomPolicy">
 
     <BuildingBlocks>
         <!-- Building Blocks Here-->
@@ -271,20 +271,6 @@
                         TransformationClaimType="outputClaim" />
                 </OutputClaims>
             </ClaimsTransformation>
-
-            <ClaimsTransformation Id="CreateAlternativeSecurityId"
-                TransformationMethod="CreateAlternativeSecurityId">
-                <InputClaims>
-                    <InputClaim ClaimTypeReferenceId="issuerUserId"
-                        TransformationClaimType="issuerUserId" />
-                    <InputClaim ClaimTypeReferenceId="identityProvider"
-                        TransformationClaimType="identityProvider" />
-                </InputClaims>
-                <OutputClaims>
-                    <OutputClaim ClaimTypeReferenceId="alternativeSecurityId"
-                        TransformationClaimType="alternativeSecurityId" />
-                </OutputClaims>
-            </ClaimsTransformation>
         </ClaimsTransformations>
 
         <ContentDefinitions>
@@ -315,7 +301,12 @@
                     <OutputTokenFormat>JWT</OutputTokenFormat>
                     <Metadata>
                         <Item Key="client_id">{service:te}</Item>
+                        <Item Key="token_lifetime_secs">300</Item>
+                        <Item Key="id_token_lifetime_secs">3600</Item>
+                        <Item Key="refresh_token_lifetime_secs">86400</Item>
+                        <Item Key="rolling_refresh_token_lifetime_secs">86400</Item>
                         <Item Key="issuer_refresh_token_user_identity_claim_type">objectId</Item>
+                        <Item Key="AuthenticationContextReferenceClaimPattern">None</Item>
                         <Item Key="SendTokenResponseBodyWithJsonNumbers">true</Item>
                     </Metadata>
                     <CryptographicKeys>
@@ -323,6 +314,50 @@
                         <Key Id="issuer_refresh_token_key"
                             StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
                     </CryptographicKeys>
+                </TechnicalProfile>
+                <TechnicalProfile Id="UserInfoIssuer">
+                    <DisplayName>JSON Issuer</DisplayName>
+                    <Protocol Name="None" />
+                    <OutputTokenFormat>JSON</OutputTokenFormat>
+                    <CryptographicKeys>
+                        <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+                    </CryptographicKeys>
+                    <!-- The Below claims are what will be returned on the UserInfo Endpoint if in
+                    the Claims Bag-->
+                    <InputClaims>
+                        <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+                        <InputClaim ClaimTypeReferenceId="givenName" />
+                        <InputClaim ClaimTypeReferenceId="surname" />
+                        <InputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+                        <InputClaim ClaimTypeReferenceId="userName" />
+                    </InputClaims>
+                </TechnicalProfile>
+                <TechnicalProfile Id="UserInfoAuthorization">
+                    <DisplayName>UserInfo authorization</DisplayName>
+                    <Protocol Name="None" />
+                    <InputTokenFormat>JWT</InputTokenFormat>
+                    <Metadata>
+                        <!-- Update the Issuer and Audience below -->
+                        <!-- Audience is optional, Issuer is required-->
+                        <Item Key="issuer">https://devoio.b2clogin.com/99a1ad0a-315f-4f4e-aec2-72e9588565a0/v2.0/</Item>
+                        <!-- <Item Key="audience">[ "b2787263-b02a-4229-8226-0253310339ee",
+                            "33333333-3333-3333-3333-333333333333" ]</Item> -->
+                        <!-- <Item Key="client_assertion_type">
+                            urn:ietf:params:oauth:client-assertion-type:jwt-bearer</Item> -->
+                    </Metadata>
+                    <CryptographicKeys>
+                        <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+                    </CryptographicKeys>
+                    <OutputClaims>
+                        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+                        <OutputClaim ClaimTypeReferenceId="userName"
+                            PartnerClaimType="id" />
+                        <!-- Optional claims to read from the access token. -->
+                        <!-- <OutputClaim ClaimTypeReferenceId="givenName"
+                        PartnerClaimType="given_name"/>
+             <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="family_name"/>
+             <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name"/> -->
+                    </OutputClaims>
                 </TechnicalProfile>
             </TechnicalProfiles>
         </ClaimsProvider>
@@ -500,6 +535,21 @@
         <ClaimsProvider>
             <DisplayName>Azure AD Technical Profiles</DisplayName>
             <TechnicalProfiles>
+                <TechnicalProfile Id="AAD-Common">
+                    <DisplayName>Azure Active Directory</DisplayName>
+                    <Protocol Name="Proprietary"
+                        Handler="Web.TPEngine.Providers.AzureActiveDirectoryProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
+                    <CryptographicKeys>
+                        <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+                    </CryptographicKeys>
+
+                    <!-- We need this here to suppress the SelfAsserted provider from invoking SSO on validation
+                    profiles. -->
+                    <IncludeInSso>false</IncludeInSso>
+                    <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+                </TechnicalProfile>
+
                 <!--You'll
                 add you Azure AD Technical Profiles here-->
                 <TechnicalProfile Id="AAD-UserWrite">
@@ -548,6 +598,37 @@
                         <OutputClaim ClaimTypeReferenceId="surname" />
                         <OutputClaim ClaimTypeReferenceId="displayName" />
                     </OutputClaims>
+                </TechnicalProfile>
+
+                <!-- The following technical profile is used to read data after user authenticates. -->
+                <TechnicalProfile Id="AAD-UserReadUsingObjectId">
+                    <Metadata>
+                        <Item Key="Operation">Read</Item>
+                        <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+                    </Metadata>
+                    <IncludeInSso>false</IncludeInSso>
+                    <InputClaims>
+                        <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+                    </InputClaims>
+                    <OutputClaims>
+                        <OutputClaim ClaimTypeReferenceId="userName" PartnerClaimType="signInNames.userName" />
+                        <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
+                        <OutputClaim ClaimTypeReferenceId="givenName" />
+                        <OutputClaim ClaimTypeReferenceId="surname" />
+                        <OutputClaim ClaimTypeReferenceId="displayName" />
+                    </OutputClaims>
+                    <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+                </TechnicalProfile>
+            </TechnicalProfiles>
+        </ClaimsProvider>
+
+        <ClaimsProvider>
+            <DisplayName>Session Management</DisplayName>
+            <TechnicalProfiles>
+                <TechnicalProfile Id="SM-Noop">
+                    <DisplayName>Noop Session Management Provider</DisplayName>
+                    <Protocol Name="Proprietary"
+                        Handler="Web.TPEngine.SSO.NoopSSOSessionProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
                 </TechnicalProfile>
             </TechnicalProfiles>
         </ClaimsProvider>
@@ -720,6 +801,31 @@
                     CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
             </OrchestrationSteps>
         </UserJourney>
+
+        <UserJourney Id="UserInfoJourney"
+            DefaultCpimIssuerTechnicalProfileReferenceId="UserInfoIssuer">
+            <Authorization>
+                <AuthorizationTechnicalProfiles>
+                    <AuthorizationTechnicalProfile ReferenceId="UserInfoAuthorization" />
+                </AuthorizationTechnicalProfiles>
+            </Authorization>
+            <OrchestrationSteps>
+                <OrchestrationStep Order="1" Type="ClaimsExchange">
+                    <Preconditions>
+                        <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                            <Value>userName</Value>
+                            <Action>SkipThisOrchestrationStep</Action>
+                        </Precondition>
+                    </Preconditions>
+                    <ClaimsExchanges UserIdentity="false">
+                        <ClaimsExchange Id="AADUserReadWithObjectId"
+                            TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+                <OrchestrationStep Order="2" Type="SendClaims"
+                    CpimIssuerTechnicalProfileReferenceId="UserInfoIssuer" />
+            </OrchestrationSteps>
+        </UserJourney>
     </UserJourneys>
 
     <RelyingParty>
@@ -729,16 +835,19 @@
                 Specify the claims to include in the token that is returned when the policy runs
             -->
         <DefaultUserJourney ReferenceId="CombinedSignInJourney" />
+        <Endpoints>
+            <Endpoint Id="UserInfo" UserJourneyReferenceId="UserInfoJourney" />
+        </Endpoints>
         <TechnicalProfile Id="HelloWorldPolicyProfile">
             <DisplayName>Hello World Policy Profile</DisplayName>
             <Protocol Name="OpenIdConnect" />
             <OutputClaims>
                 <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
                 <OutputClaim ClaimTypeReferenceId="userName" PartnerClaimType="id" />
-                <OutputClaim ClaimTypeReferenceId="displayName" />
+                <!-- <OutputClaim ClaimTypeReferenceId="displayName" />
                 <OutputClaim ClaimTypeReferenceId="givenName" />
                 <OutputClaim ClaimTypeReferenceId="surname" />
-                <OutputClaim ClaimTypeReferenceId="email" />
+                <OutputClaim ClaimTypeReferenceId="email" /> -->
             </OutputClaims>
             <SubjectNamingInfo ClaimType="sub" />
         </TechnicalProfile>
