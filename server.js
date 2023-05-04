@@ -111,6 +111,10 @@ fastify.post("/users/changePassword", async (request, reply) => {
     reply.status(409).send(errorResponse);
   }
 
+    //update user password
+    user.password = request.body.newPassword;
+    user.status = "active";
+  
   const result = {
     passwordChange: true,
     Remarks: "Your password has been change.",
