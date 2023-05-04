@@ -79,7 +79,6 @@ fastify.post("/users", async (request, reply) => {
       developerMessage: `The provided user ${request.body.user} and password cannot found.`,
     };
     reply.status(409).send(errorResponse);
-    return
   }
 });
 
@@ -125,7 +124,6 @@ fastify.post("/users/changePassword", async (request, reply) => {
     Remarks: "Your password has been change.",
   };
   reply.status(200).send(result);
-  return
 });
 
 // Run the server!
