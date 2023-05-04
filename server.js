@@ -113,7 +113,9 @@ fastify.post("/users/changePassword", async (request, reply) => {
 
     //update user password
     users.find((obj) => {
-      obj.password = request.body.newPassword;
+      if(obj.user === request.body.user.toLowerCase()){
+        obj.password = request.body.newPassword;
+      }
     });
   
   const result = {
