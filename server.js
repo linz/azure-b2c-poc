@@ -35,7 +35,6 @@ fastify.get("/users/:email", async (request, reply) => {
 });
 
 fastify.post("/users", async (request, reply) => {
-
   const found = findUser(request);
 
   if (found) {
@@ -81,8 +80,37 @@ fastify.post("/users", async (request, reply) => {
   }
 });
 
-fastify.post("/users/changePassword", async (requst, reply) => {
-  //const found = findUser();
+fastify.post("/users/changePassword", async (request, reply) => {
+  // find user
+  const user = users.find((obj) => {
+    return obj.user === request.body.user.toLowerCase();
+  });
+
+  // validate password
+  if (user.password != request.body.oldPassword) {
+    let errorResponse = {
+      version: "1.0",
+      status: 409,
+      code: "errorCode",
+      requestId: "requestId",
+      userMessage: "Invalid old password.",
+      developerMessage: `The provided user ${request.body.user} old password is not correct.`,
+    };
+    reply.status(409).send(errorResponse);
+  }
+
+  if (request.body.oldPassword === request.body.newPassword) {
+    let errorResponse = {
+      version: "1.0",
+      status: 409,
+      code: "errorCode",
+      requestId: "requestId",
+      userMessage: "Old and new password are the same",
+      developerMessage: `The provided user ${request.body.user} old password and new password are the same.`,
+    };
+    reply.status(409).send(errorResponse);
+  }
+
   const result = {
     passwordChange: true,
     Remarks: "Your password has been change.",
@@ -107,4 +135,3 @@ function findUser(request) {
     );
   });
 }
-
