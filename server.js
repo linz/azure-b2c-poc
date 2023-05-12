@@ -7,7 +7,7 @@ fastify.register(require("@fastify/formbody"));
 
 fastify.post("/log", async (request, reply) => {
   console.log("request.body", request.body);
-  reply.status(404);
+  reply.status(200);
 });
 
 fastify.get("/users/:email", async (request, reply) => {
@@ -20,6 +20,8 @@ fastify.get("/users/:email", async (request, reply) => {
       givenName: found.givenName,
       surname: found.surname,
       email: found.email,
+      status: found.status,
+      profiles: found.profiles,
     };
     reply.status(200).send(result);
     return;
@@ -67,6 +69,7 @@ fastify.post("/users", async (request, reply) => {
       surname: found.surname,
       email: found.email,
       status: found.status,
+      profiles: found.profiles,
     };
     reply.status(200).send(result);
   } else {

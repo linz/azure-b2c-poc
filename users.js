@@ -6,6 +6,50 @@ const users = [
     surname: "Weng",
     status: "active",
     email: "test15@outlook.com",
+    profiles: [
+      "PROFILE_EXTERNAL_SEARCH_USER",
+      "PROFILE_EXTERNAL_NOTICES",
+      "PROFILE_EXTERNAL_TITLES_USER",
+      "PROFILE_EXTERNAL_SYSTEM_MANAGER",
+    ],
+    firms: [
+      {
+        id: "linzautowe",
+        name: "LINZ Automation",
+        privileges: [
+          "PRV_CANCEL_WITH_DEAL",
+          "PRV_CREATE_DEAL_TIN",
+          "PRV_EDIT_MODIFY_DEAL_TIN",
+          "PRV_PRE_VALIDATE_DEAL",
+          "PRV_PRE_VALIDATE_TIN",
+          "PRV_RELEASE_TIN",
+          "PRV_SEARCH_PRIVILEGE",
+          "PRV_SIGN_TIN",
+          "PRV_SIGN_VIEW",
+          "PRV_SPATIAL_VIEW",
+          "PRV_SUBMIT_DEAL",
+          "PRV_VIEW_DEAL_TIN",
+          "PRV_WITHDRAW_DEALING",
+        ],
+      },
+      {
+        id: "linznowe",
+        name: "LINZ Digital Delivery",
+        privileges: [
+          "PRV_CANCEL_WITH_DEAL",
+          "PRV_CREATE_DEAL_TIN",
+          "PRV_EDIT_MODIFY_DEAL_TIN",
+          "PRV_PRE_VALIDATE_DEAL",
+          "PRV_PRE_VALIDATE_TIN",
+          "PRV_RELEASE_TIN",
+          "PRV_SEARCH_PRIVILEGE",
+          "PRV_SIGN_TIN",
+          "PRV_SPATIAL_VIEW",
+          "PRV_SUBMIT_DEAL",
+          "PRV_VIEW_DEAL_TIN",
+        ],
+      },
+    ],
   },
   {
     user: "user1",
@@ -165,7 +209,7 @@ const users = [
     givenName: "Joe21",
     surname: "Smith21",
     status: "active",
-    email: "test15@outlook.com"
+    email: "test15@outlook.com",
   },
 ];
 

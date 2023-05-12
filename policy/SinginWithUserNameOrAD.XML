@@ -58,6 +58,33 @@
                 <UserInputType>TextBox</UserInputType>
             </ClaimType>
 
+            <ClaimType Id="profiles">
+                <DisplayName>Profiles</DisplayName>
+                <DataType>stringCollection</DataType>
+            </ClaimType>
+
+            <ClaimType Id="extension_profilesJson">
+                <DisplayName>JSON formatted string for Profiles</DisplayName>
+                <DataType>string</DataType>
+            </ClaimType>
+
+            <ClaimType Id="extension_profiles">
+                <DisplayName>JSON formatted string for Profiles</DisplayName>
+                <DataType>string</DataType>
+            </ClaimType>
+
+            <ClaimType Id="extension_linzEmail">
+                <DisplayName>Linz email</DisplayName>
+                <DataType>string</DataType>
+                <UserHelpText>Linz email address</UserHelpText>
+                <UserInputType>TextBox</UserInputType>
+            </ClaimType>
+
+            <ClaimType Id="jsonBlob">
+                <DisplayName>Just for test</DisplayName>
+                <DataType>string</DataType>
+            </ClaimType>
+
             <ClaimType Id="userName">
                 <DisplayName>User Name</DisplayName>
                 <DataType>string</DataType>
@@ -229,6 +256,43 @@
         </PredicateValidations>
 
         <ClaimsTransformations>
+            <ClaimsTransformation Id="GenerateJsonBlob" TransformationMethod="GenerateJson">
+                <InputClaims>
+                    <InputClaim ClaimTypeReferenceId="userName" TransformationClaimType="username" />
+                    <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="email" />
+                </InputClaims>
+                <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="jsonBlob" TransformationClaimType="outputClaim" />
+                </OutputClaims>
+            </ClaimsTransformation>
+
+            <ClaimsTransformation Id="GenerateProfilesCsv"
+                TransformationMethod="StringJoin">
+                <InputClaims>
+                    <InputClaim ClaimTypeReferenceId="profiles" TransformationClaimType="inputClaim" />
+                </InputClaims>
+                <InputParameters>
+                    <InputParameter DataType="string" Id="delimiter" Value="," />
+                </InputParameters>
+                <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="extension_profiles"
+                        TransformationClaimType="outputClaim" />
+                </OutputClaims>
+            </ClaimsTransformation>
+
+            <ClaimsTransformation Id="ParseProfilesCsv"
+                TransformationMethod="StringSplit">
+                <InputClaims>
+                    <InputClaim ClaimTypeReferenceId="extension_profiles" TransformationClaimType="inputClaim" />
+                </InputClaims>
+                <InputParameters>
+                    <InputParameter DataType="string" Id="delimiter" Value="," />
+                </InputParameters>
+                <OutputClaims>
+                    <OutputClaim ClaimTypeReferenceId="profiles"
+                        TransformationClaimType="outputClaim" />
+                </OutputClaims>
+            </ClaimsTransformation>
 
             <ClaimsTransformation Id="GenerateRandomObjectIdTransformation"
                 TransformationMethod="CreateRandomString">
@@ -315,6 +379,7 @@
                             StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
                     </CryptographicKeys>
                 </TechnicalProfile>
+
                 <TechnicalProfile Id="UserInfoIssuer">
                     <DisplayName>JSON Issuer</DisplayName>
                     <Protocol Name="None" />
@@ -330,8 +395,13 @@
                         <InputClaim ClaimTypeReferenceId="surname" />
                         <InputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
                         <InputClaim ClaimTypeReferenceId="userName" />
+                        <InputClaim ClaimTypeReferenceId="email" />
+                        <InputClaim ClaimTypeReferenceId="profiles" />
+                        <InputClaim ClaimTypeReferenceId="extension_profiles" />
+                        <InputClaim ClaimTypeReferenceId="jsonBlob" />
                     </InputClaims>
                 </TechnicalProfile>
+
                 <TechnicalProfile Id="UserInfoAuthorization">
                     <DisplayName>UserInfo authorization</DisplayName>
                     <Protocol Name="None" />
@@ -403,6 +473,42 @@
                         <OutputClaimsTransformation ReferenceId="CreateDisplayNameTransformation" />
                     </OutputClaimsTransformations>
                 </TechnicalProfile>
+
+                <TechnicalProfile Id="UserProfilesGenerator">
+                    <DisplayName>Generate CSV of the user profiles</DisplayName>
+                    <Protocol Name="Proprietary"
+                        Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+                    <OutputClaims>
+                        <OutputClaim ClaimTypeReferenceId="extension_profiles" />
+                    </OutputClaims>
+                    <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="GenerateProfilesCsv" />
+                    </OutputClaimsTransformations>
+                </TechnicalProfile>
+
+                <TechnicalProfile Id="UserProfilesParser">
+                    <DisplayName>Generate CSV of the user profiles</DisplayName>
+                    <Protocol Name="Proprietary"
+                        Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+                    <OutputClaims>
+                        <OutputClaim ClaimTypeReferenceId="profiles" />
+                    </OutputClaims>
+                    <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="ParseProfilesCsv" />
+                    </OutputClaimsTransformations>
+                </TechnicalProfile>
+
+                <TechnicalProfile Id="JsonBlobGenerator">
+                    <DisplayName>Generate CSV of the user profiles</DisplayName>
+                    <Protocol Name="Proprietary"
+                        Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+                    <OutputClaims>
+                        <OutputClaim ClaimTypeReferenceId="jsonBlob" />
+                    </OutputClaims>
+                    <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="GenerateJsonBlob" />
+                    </OutputClaimsTransformations>
+                </TechnicalProfile>
             </TechnicalProfiles>
         </ClaimsProvider>
 
@@ -429,6 +535,7 @@
                         <OutputClaim ClaimTypeReferenceId="givenName" />
                         <OutputClaim ClaimTypeReferenceId="surname" />
                         <OutputClaim ClaimTypeReferenceId="email" />
+                        <OutputClaim ClaimTypeReferenceId="profiles" />
                         <!-- <OutputClaim ClaimTypeReferenceId="displayName" />
                         <OutputClaim ClaimTypeReferenceId="objectId" /> -->
                     </OutputClaims>
@@ -469,17 +576,16 @@
                         <InputClaim ClaimTypeReferenceId="password" PartnerClaimType="password" />
                     </InputClaims>
                     <OutputClaims>
-                        <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="givenName" />
-                        <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="surname" />
-                        <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email" />
+                        <OutputClaim ClaimTypeReferenceId="givenName" />
+                        <OutputClaim ClaimTypeReferenceId="surname" />
+                        <OutputClaim ClaimTypeReferenceId="email" />
+                        <OutputClaim ClaimTypeReferenceId="profiles" />
                     </OutputClaims>
+                    <!-- <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="GenerateProfilesCsv" />
+                    </OutputClaimsTransformations> -->
                 </TechnicalProfile>
-            </TechnicalProfiles>
-        </ClaimsProvider>
 
-        <ClaimsProvider>
-            <DisplayName>User Lookup</DisplayName>
-            <TechnicalProfiles>
                 <TechnicalProfile Id="LookupUserViaHttp">
                     <DisplayName>Lookup user from external store</DisplayName>
                     <Protocol Name="Proprietary"
@@ -497,16 +603,14 @@
                         <OutputClaim ClaimTypeReferenceId="userName" PartnerClaimType="username" />
                         <OutputClaim ClaimTypeReferenceId="givenName" />
                         <OutputClaim ClaimTypeReferenceId="surname" />
-                        <OutputClaim ClaimTypeReferenceId="displayName" DefaultValue="Unknown User" />
                         <OutputClaim ClaimTypeReferenceId="email" />
+                        <OutputClaim ClaimTypeReferenceId="profiles" />
                     </OutputClaims>
+                    <!-- <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="GenerateProfilesCsv" />
+                    </OutputClaimsTransformations> -->
                 </TechnicalProfile>
-            </TechnicalProfiles>
-        </ClaimsProvider>
 
-        <ClaimsProvider>
-            <DisplayName>Log claims</DisplayName>
-            <TechnicalProfiles>
                 <TechnicalProfile Id="LogClaims">
                     <DisplayName>Log claims</DisplayName>
                     <Protocol Name="Proprietary"
@@ -525,6 +629,9 @@
                         <InputClaim ClaimTypeReferenceId="displayName" />
                         <InputClaim ClaimTypeReferenceId="authenticationSource" />
                         <InputClaim ClaimTypeReferenceId="identityProvider" />
+                        <InputClaim ClaimTypeReferenceId="profiles" />
+                        <InputClaim ClaimTypeReferenceId="jsonBlob" />
+                        <InputClaim ClaimTypeReferenceId="extension_profiles" />
                     </InputClaims>
                     <OutputClaims>
                     </OutputClaims>
@@ -540,6 +647,15 @@
                     <Protocol Name="Proprietary"
                         Handler="Web.TPEngine.Providers.AzureActiveDirectoryProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
+                    <Metadata>
+                        <!--Insert
+                        b2c-extensions-app application ID here, for example: 11111111-1111-1111-1111-111111111111-->
+                        <Item Key="ClientId">6f3c765b-b903-4cc4-9b0d-32cfb31fbfb8</Item>
+                        <!--Insert
+                        b2c-extensions-app application ObjectId here, for example:
+                        22222222-2222-2222-2222-222222222222-->
+                        <Item Key="ApplicationObjectId">740647d6-0161-4fc3-8d31-a384e58975fe</Item>
+                    </Metadata>
                     <CryptographicKeys>
                         <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
                     </CryptographicKeys>
@@ -560,6 +676,9 @@
                         <Item Key="Operation">Write</Item>
                         <Item Key="RaiseErrorIfClaimsPrincipalAlreadyExists">false</Item>
                     </Metadata>
+                    <!-- <InputClaimsTransformations>
+                        <InputClaimsTransformation ReferenceId="GenerateProfilesCsv" />
+                    </InputClaimsTransformations> -->
                     <InputClaims>
                         <InputClaim ClaimTypeReferenceId="userName"
                             PartnerClaimType="signInNames.userName" Required="true" />
@@ -570,14 +689,17 @@
                         <PersistedClaim ClaimTypeReferenceId="displayName" />
                         <PersistedClaim ClaimTypeReferenceId="givenName" />
                         <PersistedClaim ClaimTypeReferenceId="surname" />
+                        <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="extension_linzEmail" />
+                        <PersistedClaim ClaimTypeReferenceId="extension_profiles" />
                     </PersistedClaims>
                     <OutputClaims>
                         <OutputClaim ClaimTypeReferenceId="objectId" />
                         <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
-                        <OutputClaim ClaimTypeReferenceId="userName"
-                            PartnerClaimType="signInNames.userName" />
+                        <!-- <OutputClaim ClaimTypeReferenceId="extension_profiles" /> -->
                     </OutputClaims>
+                    <IncludeTechnicalProfile ReferenceId="AAD-Common" />
                 </TechnicalProfile>
+
                 <TechnicalProfile Id="AAD-UserRead">
                     <DisplayName>Read user from Azure AD storage</DisplayName>
                     <Protocol Name="Proprietary"
@@ -597,7 +719,15 @@
                         <OutputClaim ClaimTypeReferenceId="givenName" />
                         <OutputClaim ClaimTypeReferenceId="surname" />
                         <OutputClaim ClaimTypeReferenceId="displayName" />
+                        <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="extension_linzEmail" />
+                        <!-- <OutputClaim ClaimTypeReferenceId="profiles" PartnerClaimType="extension_profilesJson" /> -->
+                        <OutputClaim ClaimTypeReferenceId="extension_profiles" />
+                        <OutputClaim ClaimTypeReferenceId="profiles" />
                     </OutputClaims>
+                    <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="ParseProfilesCsv" />
+                    </OutputClaimsTransformations>
+                    <IncludeTechnicalProfile ReferenceId="AAD-Common" />
                 </TechnicalProfile>
 
                 <!-- The following technical profile is used to read data after user authenticates. -->
@@ -616,7 +746,14 @@
                         <OutputClaim ClaimTypeReferenceId="givenName" />
                         <OutputClaim ClaimTypeReferenceId="surname" />
                         <OutputClaim ClaimTypeReferenceId="displayName" />
+                        <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="extension_linzEmail" />
+                        <!-- <OutputClaim ClaimTypeReferenceId="profiles" PartnerClaimType="extension_profilesJson" /> -->
+                        <OutputClaim ClaimTypeReferenceId="extension_profiles" />
+                        <!-- <OutputClaim ClaimTypeReferenceId="profiles" /> -->
                     </OutputClaims>
+                    <!-- <OutputClaimsTransformations>
+                        <OutputClaimsTransformation ReferenceId="ParseProfilesCsv" />
+                    </OutputClaimsTransformations> -->
                     <IncludeTechnicalProfile ReferenceId="AAD-Common" />
                 </TechnicalProfile>
             </TechnicalProfiles>
@@ -699,47 +836,6 @@
 
     <UserJourneys>
         <!-- User Journeys Here-->
-        <UserJourney Id="ADSignInJourney">
-            <OrchestrationSteps>
-                <OrchestrationStep Order="1" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="AD" TechnicalProfileReferenceId="LINZ-Staff-OIDC" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-
-                <!-- <OrchestrationStep Order="2" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="Lookup"
-                            TechnicalProfileReferenceId="LogClaims" />
-                    </ClaimsExchanges>
-                </OrchestrationStep> -->
-
-                <OrchestrationStep Order="2" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="Lookup"
-                            TechnicalProfileReferenceId="LookupUserViaHttp" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-
-                <OrchestrationStep Order="3" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="GenDisplayName"
-                            TechnicalProfileReferenceId="UserInputDisplayNameGenerator" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-
-                <OrchestrationStep Order="4" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="UpsertLocal"
-                            TechnicalProfileReferenceId="AAD-UserWrite" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-
-                <OrchestrationStep Order="5" Type="SendClaims"
-                    CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
-            </OrchestrationSteps>
-        </UserJourney>
-
         <UserJourney Id="CombinedSignInJourney">
             <OrchestrationSteps>
                 <OrchestrationStep Order="1" Type="CombinedSignInAndSignUp"
@@ -792,12 +888,40 @@
 
                 <OrchestrationStep Order="5" Type="ClaimsExchange">
                     <ClaimsExchanges>
+                        <ClaimsExchange Id="GenProfileCsv"
+                            TechnicalProfileReferenceId="UserProfilesGenerator" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="6" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="JsonBlob"
+                            TechnicalProfileReferenceId="JsonBlobGenerator" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="7" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="Log"
+                            TechnicalProfileReferenceId="LogClaims" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="8" Type="ClaimsExchange">
+                    <ClaimsExchanges>
                         <ClaimsExchange Id="UpsertLocal"
                             TechnicalProfileReferenceId="AAD-UserWrite" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
 
-                <OrchestrationStep Order="6" Type="SendClaims"
+                <OrchestrationStep Order="9" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="ParseProfileCsv"
+                            TechnicalProfileReferenceId="UserProfilesParser" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="10" Type="SendClaims"
                     CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
             </OrchestrationSteps>
         </UserJourney>
@@ -822,7 +946,36 @@
                             TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
-                <OrchestrationStep Order="2" Type="SendClaims"
+
+                <OrchestrationStep Order="2" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="ParseProfileCsv"
+                            TechnicalProfileReferenceId="UserProfilesParser" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <!-- <OrchestrationStep Order="3" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="Lookup"
+                            TechnicalProfileReferenceId="LookupUserViaHttp" />
+                    </ClaimsExchanges>
+                </OrchestrationStep> -->
+
+                <OrchestrationStep Order="3" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="JsonBlob"
+                            TechnicalProfileReferenceId="JsonBlobGenerator" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="4" Type="ClaimsExchange">
+                    <ClaimsExchanges>
+                        <ClaimsExchange Id="Log"
+                            TechnicalProfileReferenceId="LogClaims" />
+                    </ClaimsExchanges>
+                </OrchestrationStep>
+
+                <OrchestrationStep Order="5" Type="SendClaims"
                     CpimIssuerTechnicalProfileReferenceId="UserInfoIssuer" />
             </OrchestrationSteps>
         </UserJourney>
@@ -844,6 +997,9 @@
             <OutputClaims>
                 <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
                 <OutputClaim ClaimTypeReferenceId="userName" PartnerClaimType="id" />
+                <OutputClaim ClaimTypeReferenceId="givenName" />
+                <OutputClaim ClaimTypeReferenceId="profiles" />
+                <OutputClaim ClaimTypeReferenceId="extension_profiles" />
                 <!-- <OutputClaim ClaimTypeReferenceId="displayName" />
                 <OutputClaim ClaimTypeReferenceId="givenName" />
                 <OutputClaim ClaimTypeReferenceId="surname" />
