@@ -46,7 +46,7 @@ const params = Object.assign(
     clientId: "b2787263-b02a-4229-8226-0253310339ee", //STEP-AUTH-POC   //"e3186101-d75a-4f8a-a3e9-173e3b602575",
     redirectUrl: "http://localhost:11001/", //"https%3A%2F%2Fjwt.ms",
     scope:
-      "https://devoio.onmicrosoft.com/landonline-api/Landonline.All https://devoio.onmicrosoft.com/landonline-api/Search.Read openid profile offline_access",
+      "https://devoio.onmicrosoft.com/landonline-api/Landonline.All https://devoio.onmicrosoft.com/landonline-api/Search.Read",
     response_type: "code",
     authBaseUrl:
       "https://devoio.b2clogin.com/devoio.onmicrosoft.com/b2c_1a_needchangepasswordcustompolicy/v2.0/",
@@ -123,7 +123,7 @@ function b2cPolicyLoginPage(openIdConfig) {
   return settingsValue;
 }
 
-function getSelfAsseted(transId, username, password) {
+function getSelfAsseted(transId, username, password, csrfToken) {
   // 2nd post call
   const url =
     "https://devoio.b2clogin.com/devoio.onmicrosoft.com/B2C_1A_NeedChangePasswordCustomPolicy/SelfAsserted";
@@ -162,15 +162,16 @@ function getSelfAsseted(transId, username, password) {
   const loginResponse = http.post(
     selfAssertedUrl,
     [
+      "request_type=RESPONSE",
       `username=${username}`,
       `password=${password}`,
-      "request_type=RESPONSE",
     ].join("&"),
     {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Accept: "application/json, text/javascript, */*; q=0.01",
         "accept-encoding": "gzip, deflate, br",
+        "X-CSRF-TOKEN": csrfToken,
       },
       redirects: 0,
     }
@@ -180,7 +181,7 @@ function getSelfAsseted(transId, username, password) {
   console.log(loginResponse);
 
   if (
-    !check(loginResponse, { "login status was 302": (r) => r.status === 302 })
+    !check(loginResponse, { "login status was 200": (r) => r.status === 200 })
   ) {
     fail(
       `login failed for user ${username}, status was ${loginResponse.status}`
@@ -199,7 +200,7 @@ export default function () {
   const openIdConfig = getOpenIdConfig();
 
   // user gets redirected to the login pag  e
-  sleep(1);
+  // sleep(1);
 
   const settingsValue = b2cPolicyLoginPage(openIdConfig);
 
@@ -208,6 +209,6 @@ export default function () {
   console.log(`transId: ${transId}`);
 
   // user login
-  sleep(randomIntBetween(5, 10)); // simulate user taking time entering username and password
-  getSelfAsseted(transId, params.username, params.password);
+  // sleep(randomIntBetween(5, 10)); // simulate user taking time entering username and password
+  getSelfAsseted(transId, params.username, params.password, csrf);
 }
