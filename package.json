@@ -11,5 +11,8 @@
   "dependencies": {
     "@fastify/formbody": "^7.4.0",
     "fastify": "^4.15.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
   }
 }
