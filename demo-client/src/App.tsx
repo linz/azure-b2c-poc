@@ -60,7 +60,7 @@ async function getUserInfo(
 
   if (token) {
     return await fetch(
-      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/openid/v2.0/userinfo?p=b2c_1a_usernameoradcustompolicy",
+      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/openid/v2.0/userinfo?p=b2c_1a_needchangepasswordcustompolicy",
       {
         headers: {
           Authorization: `Bearer ${token}`,

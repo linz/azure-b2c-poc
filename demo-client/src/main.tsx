@@ -15,7 +15,7 @@ const configuration: Configuration = {
   auth: {
     clientId: "b2787263-b02a-4229-8226-0253310339ee",
     authority:
-      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/B2C_1A_NEEDCHANGEPASSWORDCUSTOMPOLICY/",
+      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/b2c_1a_needchangepasswordcustompolicy",
     knownAuthorities: ["devoio.b2clogin.com"],
   },
   cache: {
