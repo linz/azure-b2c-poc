@@ -14,19 +14,14 @@ import { URLSearchParams } from "https://jslib.k6.io/url/1.0.0/index.js";
 const targetUserCount = 100;
 
 export const options = {
+
+  // performance test profile
   stages: [
     { duration: "5m", target: 10 }, // a few requests to warm service up
     { duration: "30m", target: targetUserCount }, // ramp up - this is important as we don't want all users to login at the same time
     { duration: "30m", target: targetUserCount }, // hold at target user
     { duration: "5m", target: 0 },
   ],
-  // // performance test profile
-  // stages: [
-  //   { duration: "5m", target: 10 }, // a few requests to warm service up
-  //   { duration: "30m", target: targetUserCount }, // ramp up - this is important as we don't want all users to login at the same time
-  //   { duration: "30m", target: targetUserCount }, // hold at target user
-  //   { duration: "5m", target: 0 },
-  // ],
   // // soak test profile
   // stages: [
   //   { duration: "5m", target: 10 },
