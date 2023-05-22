@@ -11,7 +11,7 @@ import {
 
 import { URLSearchParams } from "https://jslib.k6.io/url/1.0.0/index.js";
 
-const targetUserCount = 4000;
+const targetUserCount = 1480;
 
 export const options = {
   summaryTrendStats: [
@@ -377,12 +377,13 @@ export default function () {
 
   const clientRequestId = generateGUID();
 
-  // Calculate the login interval for each VU
-  const loginInterval = (60 * 1000) / 20; // 20 users per minute
+  // // Calculate the login interval for each VU
+  // const loginInterval = (60 * 1000) / 20; // 20 users per minute
 
-  // Wait for the calculated login interval
-  sleep(loginInterval);
+  // // Wait for the calculated login interval
+  // sleep(loginInterval);
 
+  sleep(1)
   const settingsValue = b2cPolicyLoginPage(clientRequestId);
 
   let csrf;
