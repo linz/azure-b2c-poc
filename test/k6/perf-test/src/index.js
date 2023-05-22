@@ -11,9 +11,19 @@ import {
 
 import { URLSearchParams } from "https://jslib.k6.io/url/1.0.0/index.js";
 
-const targetUserCount = 100;
+const targetUserCount = 4000;
 
 export const options = {
+  summaryTrendStats: [
+    "avg",
+    "min",
+    "med",
+    "max",
+    "p(95)",
+    "p(99)",
+    "p(99.99)",
+    "count",
+  ],
 
   // performance test profile
   stages: [
@@ -54,6 +64,12 @@ const params = Object.assign(
     b2cPolicy: "b2c_1a_needchangepasswordcustompolicy", //"b2c_1a_usernameoradcustompolicy",
     userInfoEndPoint:
       "https://devoio.b2clogin.com/devoio.onmicrosoft.com/openid/v2.0/userinfo",
+    authorization_endpoint:
+      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/b2c_1a_needchangepasswordcustompolicy/oauth2/v2.0/authorize",
+    token_endpoint:
+      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/b2c_1a_needchangepasswordcustompolicy/oauth2/v2.0/token",
+    end_session_endpoint:
+      "https://devoio.b2clogin.com/devoio.onmicrosoft.com/b2c_1a_needchangepasswordcustompolicy/oauth2/v2.0/logout",
   }
   //envConfigs[targetEnv]
 );
@@ -78,8 +94,8 @@ function getOpenIdConfig() {
   return JSON.parse(response.body);
 }
 
-function b2cPolicyLoginPage(openIdConfig, clientRequestId) {
-  const loginPageUrl = `${openIdConfig.authorization_endpoint}?${[
+function b2cPolicyLoginPage(clientRequestId) {
+  const loginPageUrl = `${params.authorization_endpoint}?${[
     `client_id=${params.clientId}`,
     `scope=${encodeURIComponent(params.scope)}`,
     `redirect_uri=${encodeURIComponent(params.redirectUrl)}`,
@@ -96,6 +112,16 @@ function b2cPolicyLoginPage(openIdConfig, clientRequestId) {
   ].join("&")}`;
 
   const response = http.get(loginPageUrl);
+  if (
+    !check(response, {
+      "loginPageUrl status was 200": (r) => r.status === 200,
+    })
+  ) {
+    fail(`loginPageUrl failed for user, status was ${response.status}`);
+  }
+  if (response.status != 200) {
+    console.log(response);
+  }
 
   /// Parse the HTML response using k6/html
   const doc = parseHTML(response.body);
@@ -149,17 +175,22 @@ function getSelfAsseted(transId, username, password, csrfToken) {
 
   //console.log(`login user: ${username}`)
 
-  const loginResponse = http.post(selfAssertedUrl, formData, { headers });
+  const response = http.post(selfAssertedUrl, formData, { headers });
 
-  const loginMessage = JSON.parse(loginResponse.body).message;
-  const loginStatus = JSON.parse(loginResponse.body).status;
+  const loginMessage = JSON.parse(response.body).message;
+  const loginStatus = JSON.parse(response.body).status;
 
   if (
-    !check(loginResponse, { "login status was 200": (r) => r.status === 200 })
+    !check(response, {
+      "self asserted status was 200": (r) => r.status === 200,
+    })
   ) {
     fail(
-      `login failed for user ${username}, status was ${loginResponse.status}`
+      `self asserted failed for user ${username}, status was ${response.status}`
     );
+  }
+  if (response.status != 200) {
+    console.log(response);
   }
   return { user: username, status: loginStatus, message: loginMessage };
 }
@@ -183,22 +214,32 @@ function confirmAndGetCode(csrfToken, transId) {
     "accept-encoding": "gzip, deflate, br",
   };
 
-  const loginResponse = http.get(confirmUrl, { headers, redirects: 0 });
+  const getCodeResponse = http.get(confirmUrl, { headers, redirects: 0 });
+  if (
+    !check(getCodeResponse, {
+      "get code status was 200": (r) => r.status === 200 || r.status === 302,
+    })
+  ) {
+    fail(`get code failed for user , status was ${getCodeResponse.status}`);
+  }
+  if (getCodeResponse.status != 200 && getCodeResponse.status != 302) {
+    console.log(getCodeResponse);
+  }
 
-  const responseUrl = loginResponse.headers.Location;
+  const responseUrl = getCodeResponse.headers.Location;
 
   const urlParams = new URLSearchParams(responseUrl.split("#")[1]);
   const code = urlParams.get("code");
 
   if (code == null) {
     console.log("CODE_NULL:");
-    console.log(loginResponse);
+    console.log(getCodeResponse);
   }
 
   return code;
 }
 
-function getAccessToken(clientRequestId, openIdConfig, code) {
+function getAccessToken(clientRequestId, code) {
   // Define the form data
   const formData = {
     client_id: params.clientId,
@@ -224,16 +265,15 @@ function getAccessToken(clientRequestId, openIdConfig, code) {
     "accept-encoding": "gzip, deflate, br",
   };
 
-  const response = http.post(openIdConfig.token_endpoint, formData, {
+  const response = http.post(params.token_endpoint, formData, {
     headers,
   });
 
-  // if (response.status != 200) {
-  //   console.log(response);
-  // }
-
   if (!check(response, { "token status was 200": (r) => r.status === 200 })) {
     fail(`failed in getting token, status was ${response.status}`);
+  }
+  if (response.status != 200) {
+    console.log(response);
   }
 
   const body = response.body;
@@ -263,9 +303,12 @@ function getUserInfo(token) {
   ) {
     fail(`user info token status was ${response.status}`);
   }
+  if (response.status != 200) {
+    console.log(response);
+  }
 }
 
-function refreshToken(clientRequestId, openIdConfig, token) {
+function refreshToken(clientRequestId, token) {
   const formData = {
     client_id: params.clientId,
     scope: params.scope,
@@ -288,7 +331,7 @@ function refreshToken(clientRequestId, openIdConfig, token) {
     "accept-encoding": "gzip, deflate, br",
   };
 
-  const response = http.post(openIdConfig.token_endpoint, formData, {
+  const response = http.post(params.token_endpoint, formData, {
     headers,
   });
 
@@ -299,7 +342,9 @@ function refreshToken(clientRequestId, openIdConfig, token) {
   ) {
     fail(`refresh token status was ${response.status}`);
   }
-
+  if (response.status != 200) {
+    console.log(response);
+  }
   const body = response.body;
   const accessToken = JSON.parse(body).access_token;
   const refreshToken = JSON.parse(body).refresh_token;
@@ -307,14 +352,12 @@ function refreshToken(clientRequestId, openIdConfig, token) {
   return { access_token: accessToken, refresh_token: refreshToken };
 }
 
-function logout(openIdConfig, token) {
-  console.log(token);
-  const logoutUrl = `${openIdConfig.end_session_endpoint}?${[
+function logout(token) {
+  const logoutUrl = `${params.end_session_endpoint}?${[
     `id_token_hint=${token.id_token}`,
     `post_logout_redirect_uri=${encodeURIComponent(params.redirectUrl)}`,
   ].join("&")}`;
   const response = http.get(logoutUrl, { redirects: 0 });
-  console.log(response.body);
   if (
     !check(response, {
       "logout status was 200 or 302": (r) =>
@@ -323,25 +366,45 @@ function logout(openIdConfig, token) {
   ) {
     fail(`user info token status was ${response.status}`);
   }
+  if (response.status != 200 && response.status != 302) {
+    console.log(response);
+  }
 }
 
 export default function () {
   const randomUser = randomItem(users)[0];
-  //console.log(`USER: ${randomUser}`)
+  //console.log(`USER: ${randomUser}`);
 
-  // user visits application page, which would query for openid config
-  const openIdConfig = getOpenIdConfig();
   const clientRequestId = generateGUID();
 
-  // user gets redirected to the login page
-  sleep(1);
+  // Calculate the login interval for each VU
+  const loginInterval = (60 * 1000) / 20; // 20 users per minute
 
-  const settingsValue = b2cPolicyLoginPage(openIdConfig, clientRequestId);
-  const csrf = JSON.parse(settingsValue).csrf;
-  const transId = JSON.parse(settingsValue).transId;
+  // Wait for the calculated login interval
+  sleep(loginInterval);
+
+  const settingsValue = b2cPolicyLoginPage(clientRequestId);
+
+  let csrf;
+  let transId;
+
+  if (JSON.parse(settingsValue).hasOwnProperty("csrf")) {
+    csrf = JSON.parse(settingsValue).csrf;
+  } else {
+    console.log("csrf not Found");
+    return;
+  }
+
+  if (JSON.parse(settingsValue).hasOwnProperty("transId")) {
+    transId = JSON.parse(settingsValue).transId;
+  } else {
+    console.log("transId not Found");
+    return;
+  }
 
   // user login
   sleep(randomIntBetween(5, 10)); // simulate user taking time entering username and password
+
   const loginResponse = getSelfAsseted(
     transId,
     randomUser,
@@ -359,9 +422,10 @@ export default function () {
 
   // user gets redirected to the application after successful login, which will exchange session code with token
   sleep(randomIntBetween(5, 10)); // simulate application load
-  let token = getAccessToken(clientRequestId, openIdConfig, code);
+  let token = getAccessToken(clientRequestId, code);
 
   // application UI retrieves user info
+
   getUserInfo(token);
 
   // simulates the user using the application for 10-40 minutes, during which the application would refresh token and
@@ -370,14 +434,17 @@ export default function () {
   const secondsBetweenRefreshToken = 60 * 4;
   while (sessionLengthSeconds > secondsBetweenRefreshToken) {
     sleep(secondsBetweenRefreshToken);
-    token = refreshToken(clientRequestId, openIdConfig, token);
+
+    token = refreshToken(clientRequestId, token);
+
     getUserInfo(token);
+
     sessionLengthSeconds -= secondsBetweenRefreshToken;
   }
   sleep(sessionLengthSeconds);
 
   // simulate only a small percentage of user explicitly log out (the rest would simply close their browser)
   if (randomIntBetween(1, 10) === 1) {
-    logout(openIdConfig, token);
+    logout(token);
   }
 }
