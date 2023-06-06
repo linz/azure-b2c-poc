@@ -566,7 +566,7 @@
                     <Protocol Name="Proprietary"
                         Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
                     <Metadata>
-                        <Item Key="ServiceUrl">https://mock-user-store.onrender.com/users</Item>
+                        <Item Key="ServiceUrl">https://mockuserstore1-jweng.b4a.run/users</Item>
                         <Item Key="SendClaimsIn">Body</Item>
                         <Item Key="AuthenticationType">None</Item>
                         <Item Key="AllowInsecureAuthInProduction">true</Item>
@@ -591,7 +591,7 @@
                     <Protocol Name="Proprietary"
                         Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
                     <Metadata>
-                        <Item Key="ServiceUrl">https://mock-user-store.onrender.com/users/{email}</Item>
+                        <Item Key="ServiceUrl">https://mockuserstore1-jweng.b4a.run/users/{email}</Item>
                         <Item Key="SendClaimsIn">Url</Item>
                         <Item Key="AuthenticationType">None</Item>
                         <Item Key="AllowInsecureAuthInProduction">true</Item>
@@ -616,7 +616,7 @@
                     <Protocol Name="Proprietary"
                         Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
                     <Metadata>
-                        <Item Key="ServiceUrl">https://mock-user-store.onrender.com/log</Item>
+                        <Item Key="ServiceUrl">https://mockuserstore1-jweng.b4a.run/log</Item>
                         <Item Key="SendClaimsIn">Body</Item>
                         <Item Key="AuthenticationType">None</Item>
                         <Item Key="AllowInsecureAuthInProduction">true</Item>
