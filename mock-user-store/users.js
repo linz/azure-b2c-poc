@@ -52,6 +52,14 @@ const users = [
     ],
   },
   {
+    user: "bgunasekar",
+    password: "Password123",
+    givenName: "Xyle",
+    surname: "Doe",
+    status: "locked",
+    email: "user1@outlook.com",
+  },
+  {
     user: "user1",
     password: "Password123",
     givenName: "Xyle",
