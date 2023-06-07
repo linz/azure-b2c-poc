@@ -54,9 +54,9 @@ const users = [
   {
     user: "bgunasekar",
     password: "Password123",
-    givenName: "Xyle",
-    surname: "Doe",
-    status: "locked",
+    givenName: "Bharathi",
+    surname: "Gunasekar",
+    status: "active",
     email: "user1@outlook.com",
   },
   {
